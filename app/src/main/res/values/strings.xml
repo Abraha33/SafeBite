@@ -1,3 +1,28 @@
 <resources>
     <string name="app_name">SafeBite</string>
+
+    <!-- Autenticación -->
+    <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_login_subtitle">Accede con tu correo y contraseña.</string>
+    <string name="auth_register_title">Crear cuenta</string>
+    <string name="auth_register_subtitle">Regístrate para guardar tu perfil de forma local.</string>
+    <string name="auth_field_name">Nombre completo</string>
+    <string name="auth_field_email">Correo electrónico</string>
+    <string name="auth_field_password">Contraseña</string>
+    <string name="auth_action_login">Entrar</string>
+    <string name="auth_action_register">Registrarme</string>
+    <string name="auth_action_go_register">¿No tienes cuenta? Regístrate</string>
+    <string name="auth_action_go_login">Ya tengo cuenta</string>
+
+    <string name="error_required">Este campo es obligatorio.</string>
+    <string name="error_email_invalid">Introduce un correo con formato válido.</string>
+    <string name="error_password_short">La contraseña debe tener al menos 6 caracteres.</string>
+    <string name="error_name_short">El nombre debe tener al menos 2 caracteres.</string>
+    <string name="error_email_registered">Ese correo ya está registrado.</string>
+    <string name="error_user_not_found">No existe una cuenta con ese correo.</string>
+    <string name="error_bad_password">La contraseña no coincide.</string>
+    <string name="error_unknown">Ocurrió un error. Intenta de nuevo.</string>
+
+    <string name="register_ok">Registro guardado correctamente.</string>
+    <string name="login_ok">Bienvenido a SafeBite.</string>
 </resources>
