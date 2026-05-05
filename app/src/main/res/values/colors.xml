@@ -7,4 +7,12 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Semáforo de riesgo (chips del historial) -->
+    <color name="risk_safe_container">#FFE8F5E9</color>
+    <color name="risk_safe_on">#FF1B5E20</color>
+    <color name="risk_warning_container">#FFFFF3E0</color>
+    <color name="risk_warning_on">#FFE65100</color>
+    <color name="risk_danger_container">#FFFFEBEE</color>
+    <color name="risk_danger_on">#FFB71C1C</color>
 </resources>

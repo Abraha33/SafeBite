@@ -40,4 +40,16 @@
     <string name="error_allergen_empty">El nombre no puede estar vacío.</string>
     <string name="error_allergen_short">Nombre demasiado corto (mínimo 3 caracteres).</string>
     <string name="error_allergen_duplicate">Ese ingrediente ya está en tu lista.</string>
+
+    <!-- Historial de escaneos -->
+    <string name="history_title">Historial de escaneos</string>
+    <string name="history_subtitle">Productos que ya analizaste con SafeBite.</string>
+    <string name="history_empty">Aún no hay escaneos. Cuando uses el escáner, aparecerán aquí.</string>
+    <string name="history_add_sample">Agregar escaneo de ejemplo</string>
+    <string name="history_sample_text">Ingredientes: leche en polvo, maní, trigo (gluten), soya. Puede contener trazas de nuez.</string>
+    <string name="history_item_click_hint">Escaneo #%1$s — en la página 4 verás el detalle completo.</string>
+    <string name="history_open_button">Ver historial</string>
+    <string name="risk_safe">Seguro</string>
+    <string name="risk_warning">Precaución</string>
+    <string name="risk_danger">Peligro</string>
 </resources>

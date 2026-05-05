@@ -29,6 +29,9 @@ class ScannerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.buttonOpenHistory.setOnClickListener {
+            findNavController().navigate(R.id.action_scanner_to_history)
+        }
         binding.buttonManageAllergens.setOnClickListener {
             findNavController().navigate(R.id.action_scanner_to_allergens)
         }
