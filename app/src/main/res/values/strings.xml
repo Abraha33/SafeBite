@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">SafeBite</string>
-
     <!-- Autenticación -->
     <string name="auth_login_title">Iniciar sesión</string>
     <string name="auth_login_subtitle">Accede con tu correo y contraseña.</string>
