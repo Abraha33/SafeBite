@@ -28,4 +28,16 @@
 
     <string name="auth_scanner_title">Escáner de etiquetas</string>
     <string name="auth_scanner_body">Próximamente: CameraX + ML Kit Text Recognition. Has iniciado sesión correctamente.</string>
+
+    <!-- Alérgenos (lista negra) -->
+    <string name="allergens_title">Mi lista negra</string>
+    <string name="allergens_subtitle">Agrega ingredientes que la app debe detectar como riesgo en tus etiquetas.</string>
+    <string name="allergen_hint">Ej: lactosa, maní, gluten…</string>
+    <string name="allergen_add_button">Agregar a mi lista</string>
+    <string name="allergens_open_button">Gestionar alérgenos</string>
+    <string name="allergens_empty">Aún no tienes alérgenos. Agrega el primero arriba.</string>
+    <string name="allergen_delete_cd">Eliminar alérgeno</string>
+    <string name="error_allergen_empty">El nombre no puede estar vacío.</string>
+    <string name="error_allergen_short">Nombre demasiado corto (mínimo 3 caracteres).</string>
+    <string name="error_allergen_duplicate">Ese ingrediente ya está en tu lista.</string>
 </resources>

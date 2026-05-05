@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScannerBinding
 
 /**
@@ -23,6 +25,13 @@ class ScannerFragment : Fragment() {
     ): View {
         _binding = FragmentScannerBinding.inflate(inflater, container, false)
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.buttonManageAllergens.setOnClickListener {
+            findNavController().navigate(R.id.action_scanner_to_allergens)
+        }
     }
 
     override fun onDestroyView() {

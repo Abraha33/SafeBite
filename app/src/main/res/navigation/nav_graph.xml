@@ -34,5 +34,16 @@
         android:id="@+id/scannerFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.ScannerFragment"
         android:label="@string/auth_scanner_title"
-        tools:layout="@layout/fragment_scanner" />
+        tools:layout="@layout/fragment_scanner">
+        <action
+            android:id="@+id/action_scanner_to_allergens"
+            app:destination="@id/allergensFragment" />
+    </fragment>
+
+    <!-- Lista negra de alérgenos (formulario + RecyclerView + Room) -->
+    <fragment
+        android:id="@+id/allergensFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.allergens.AllergensFragment"
+        android:label="@string/allergens_title"
+        tools:layout="@layout/fragment_allergens" />
 </navigation>
