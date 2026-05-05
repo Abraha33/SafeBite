@@ -1,59 +1,68 @@
 package unab.edu.co.abrahamcaceres.safebite.ui.auth
 
-import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.core.widget.doAfterTextChanged
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputLayout
 import unab.edu.co.abrahamcaceres.safebite.R
-import unab.edu.co.abrahamcaceres.safebite.databinding.ActivityRegisterBinding
+import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentRegisterBinding
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AuthViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AuthViewModelFactory
 
 /**
- * Pantalla de registro (nombre, email, contraseña) con validación y persistencia en Room.
+ * Registro con validación en ViewModel y persistencia Room; vuelve al login vía Navigation.
  */
-class RegisterActivity : AppCompatActivity() {
+class RegisterFragment : Fragment() {
 
-    private lateinit var binding: ActivityRegisterBinding
+    private var _binding: FragmentRegisterBinding? = null
+    private val binding get() = _binding!!
 
     private val viewModel: AuthViewModel by viewModels {
-        AuthViewModelFactory(application)
+        AuthViewModelFactory(requireActivity().application)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityRegisterBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentRegisterBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setupObservers()
         setupListeners()
     }
 
     private fun setupObservers() {
-        viewModel.nameError.observe(this) { message ->
+        viewModel.nameError.observe(viewLifecycleOwner) { message ->
             setError(binding.layoutName, message)
         }
-        viewModel.emailError.observe(this) { message ->
+        viewModel.emailError.observe(viewLifecycleOwner) { message ->
             setError(binding.layoutEmail, message)
         }
-        viewModel.passwordError.observe(this) { message ->
+        viewModel.passwordError.observe(viewLifecycleOwner) { message ->
             setError(binding.layoutPassword, message)
         }
-        viewModel.registerSuccess.observe(this) { success ->
+        viewModel.registerSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
                 viewModel.consumeRegisterSuccess()
                 val email = binding.inputEmail.text?.toString().orEmpty().trim()
-                Toast.makeText(this, R.string.register_ok, Toast.LENGTH_SHORT).show()
-                // Navegación por Intent hacia Login tras registro exitoso (requisito del curso).
-                startActivity(
-                    Intent(this, LoginActivity::class.java).apply {
-                        putExtra(LoginActivity.EXTRA_EMAIL, email)
-                    }
+                Toast.makeText(requireContext(), R.string.register_ok, Toast.LENGTH_SHORT).show()
+                // Pasa el correo al fragmento de login usando el back stack entry anterior.
+                findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                    LoginFragment.KEY_PREFILL_EMAIL,
+                    email
                 )
-                finish()
+                findNavController().popBackStack()
             }
         }
     }
@@ -71,12 +80,17 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         binding.buttonGoLogin.setOnClickListener {
-            finish()
+            findNavController().popBackStack()
         }
     }
 
     private fun setError(layout: TextInputLayout, message: String?) {
         layout.error = message
         layout.isErrorEnabled = message != null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

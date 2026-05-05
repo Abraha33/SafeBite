@@ -25,4 +25,7 @@
 
     <string name="register_ok">Registro guardado correctamente.</string>
     <string name="login_ok">Bienvenido a SafeBite.</string>
+
+    <string name="auth_scanner_title">Escáner de etiquetas</string>
+    <string name="auth_scanner_body">Próximamente: CameraX + ML Kit Text Recognition. Has iniciado sesión correctamente.</string>
 </resources>

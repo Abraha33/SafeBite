@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <!-- Pantalla inicial: inicio de sesión -->
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.LoginFragment"
+        android:label="@string/auth_login_title"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/registerFragment" />
+        <!-- Tras login exitoso: limpia el back stack hasta login y muestra el escáner -->
+        <action
+            android:id="@+id/action_login_to_scanner"
+            app:destination="@id/scannerFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <!-- Registro con validación y persistencia Room -->
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.RegisterFragment"
+        android:label="@string/auth_register_title"
+        tools:layout="@layout/fragment_register" />
+
+    <!-- Destino posterior al auth (placeholder hasta integrar ML Kit / CameraX) -->
+    <fragment
+        android:id="@+id/scannerFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.ScannerFragment"
+        android:label="@string/auth_scanner_title"
+        tools:layout="@layout/fragment_scanner" />
+</navigation>

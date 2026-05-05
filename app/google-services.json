@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "494097332081",
+    "project_id": "safebite-72133",
+    "storage_bucket": "safebite-72133.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:494097332081:android:fdbc76647ef0166d0e28d0",
+        "android_client_info": {
+          "package_name": "unab.edu.co.abrahamcaceres.safebite"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMZaHiWEbCWR0-McCv0b_iSVb5YHxwwYo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

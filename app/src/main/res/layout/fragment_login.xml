@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    tools:context=".ui.auth.RegisterActivity">
+    tools:context=".ui.auth.LoginFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,38 +17,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="8dp"
-            android:text="@string/auth_register_title"
+            android:text="@string/auth_login_title"
             android:textAppearance="?attr/textAppearanceHeadlineMedium" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingBottom="24dp"
-            android:text="@string/auth_register_subtitle"
+            android:text="@string/auth_login_subtitle"
             android:textAppearance="?attr/textAppearanceBodyMedium" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/layout_name"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/auth_field_name">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/input_name"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName|textCapWords"
-                android:maxLines="1"
-                android:autofillHints="name" />
-        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/layout_email"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
             android:hint="@string/auth_field_email">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -75,22 +58,22 @@
                 android:layout_height="wrap_content"
                 android:inputType="textPassword"
                 android:maxLines="1"
-                android:autofillHints="newPassword" />
+                android:autofillHints="password" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_register"
+            android:id="@+id/button_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            android:text="@string/auth_action_register" />
+            android:text="@string/auth_action_login" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/button_go_login"
+            android:id="@+id/button_go_register"
             style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="@string/auth_action_go_login" />
+            android:text="@string/auth_action_go_register" />
     </LinearLayout>
 </ScrollView>
