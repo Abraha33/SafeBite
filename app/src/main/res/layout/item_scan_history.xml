@@ -17,9 +17,17 @@
         android:orientation="vertical"
         android:padding="12dp">
 
+        <TextView
+            android:id="@+id/textProductName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceTitleMedium"
+            tools:text="Galletas de avena" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -37,7 +45,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textAllCaps="false"
-                tools:text="Precaución" />
+                tools:text="PrecauciÃ³n" />
         </LinearLayout>
 
         <TextView
@@ -48,6 +56,6 @@
             android:ellipsize="end"
             android:maxLines="3"
             android:textAppearance="?attr/textAppearanceBodyMedium"
-            tools:text="Ingredientes: leche, soja, gluten…" />
+            tools:text="Ingredientes: leche, soja, glutenâ€¦" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

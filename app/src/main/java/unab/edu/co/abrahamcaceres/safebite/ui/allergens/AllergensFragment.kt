@@ -4,9 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +16,7 @@ import unab.edu.co.abrahamcaceres.safebite.viewmodel.AllergenViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AllergenViewModelFactory
 
 /**
- * Gestión de la lista negra de alérgenos: formulario validado + RecyclerView + Room.
+ * GestiÃ³n de la lista negra de alÃ©rgenos: formulario validado + RecyclerView + Room.
  */
 class AllergensFragment : Fragment() {
 
@@ -62,12 +62,12 @@ class AllergensFragment : Fragment() {
             adapter.submitList(list)
             val empty = list.isNullOrEmpty()
             binding.textEmptyAllergens.visibility = if (empty) View.VISIBLE else View.GONE
+            binding.rvAllergens.visibility = if (empty) View.GONE else View.VISIBLE
         }
 
         binding.btnAddAllergen.setOnClickListener {
             val name = binding.etAllergenName.text?.toString().orEmpty().trim()
 
-            // Requisito: validación de formulario en la capa de presentación.
             when {
                 name.isEmpty() -> {
                     binding.tilAllergen.error = getString(R.string.error_allergen_empty)

@@ -17,7 +17,8 @@ import java.time.format.DateTimeFormatter
 import java.util.Locale
 
 /**
- * Historial de escaneos con tarjetas Material y [onItemClick] (requisito académico).
+ * Historial de escaneos con tarjetas Material y callback de selecciÃ³n.
+ * La navegaciÃ³n queda en el Fragment para respetar la separaciÃ³n de responsabilidades.
  */
 class ScanHistoryAdapter(
     private val onItemClick: (ProductScan) -> Unit
@@ -45,10 +46,9 @@ class ScanHistoryAdapter(
         fun bind(scan: ProductScan) {
             val ctx = binding.root.context
             val instant = Instant.ofEpochMilli(scan.getCreatedAtMs())
+            binding.textProductName.text = scan.getProductName()
             binding.textScanDate.text = dateFormatter.format(instant)
-
-            val snippet = scan.getDetectedText()
-            binding.textScanSnippet.text = snippet
+            binding.textScanSnippet.text = scan.getDetectedText()
 
             bindRiskChip(binding.chipRisk, scan.getRiskLevel(), ctx)
             binding.chipRisk.isClickable = false

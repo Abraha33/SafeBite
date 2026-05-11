@@ -9,16 +9,14 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.snackbar.Snackbar
-import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScanHistoryBinding
 import unab.edu.co.abrahamcaceres.safebite.model.ProductScan
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModelFactory
 
 /**
- * Historial de productos analizados: [RecyclerView] + Room + MVVM.
- * El detalle completo (foto / texto) será la página 4; aquí [onItemClick] da feedback al usuario.
+ * Historial de productos analizados: RecyclerView + Room + MVVM.
+ * Desde aquÃ­ se navega al detalle usando Safe Args.
  */
 class ScanHistoryFragment : Fragment() {
 
@@ -58,16 +56,13 @@ class ScanHistoryFragment : Fragment() {
             adapter.submitList(list)
             val empty = list.isNullOrEmpty()
             binding.textEmptyHistory.visibility = if (empty) View.VISIBLE else View.GONE
+            binding.rvScanHistory.visibility = if (empty) View.GONE else View.VISIBLE
         }
     }
 
     private fun onScanItemClick(scan: ProductScan) {
-        // Requisito: evento onItemClick en ítems del historial (página 4: pantalla de detalle).
-        Snackbar.make(
-            binding.root,
-            getString(R.string.history_item_click_hint, scan.getId().toString()),
-            Snackbar.LENGTH_SHORT
-        ).show()
+        val action = ScanHistoryFragmentDirections.actionScanHistoryToScanDetail(scan)
+        findNavController().navigate(action)
     }
 
     override fun onDestroyView() {

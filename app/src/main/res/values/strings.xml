@@ -55,6 +55,12 @@
     <string name="history_sample_text">Ingredientes: leche en polvo, manÃ­, trigo (gluten), soya. Puede contener trazas de nuez.</string>
     <string name="history_item_click_hint">Escaneo #%1$s â€” en la pÃ¡gina 4 verÃ¡s el detalle completo.</string>
     <string name="history_open_button">Ver historial</string>
+    <string name="history_detail_title">Detalle del escaneo</string>
+    <string name="history_detail_product_label">Producto detectado</string>
+    <string name="history_detail_date_label">Fecha del anÃ¡lisis</string>
+    <string name="history_detail_risk_label">Estado de riesgo</string>
+    <string name="history_detail_ingredients_label">Ingredientes detectados por ML Kit</string>
+    <string name="history_detail_empty_ingredients">No se detectaron ingredientes legibles en este escaneo.</string>
     <string name="risk_safe">Seguro</string>
     <string name="risk_warning">PrecauciÃ³n</string>
     <string name="risk_danger">Peligro</string>

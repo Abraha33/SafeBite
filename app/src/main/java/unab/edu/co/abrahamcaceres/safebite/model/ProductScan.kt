@@ -3,10 +3,11 @@ package unab.edu.co.abrahamcaceres.safebite.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 /**
  * Registro de un producto analizado (texto detectado + nivel de riesgo).
- * POO: atributos privados y métodos de acceso.
+ * POO: atributos privados y mÃƒÂ©todos de acceso.
  */
 @Entity(tableName = "product_scans")
 class ProductScan(
@@ -20,7 +21,7 @@ class ProductScan(
     private var detectedText: String = "",
     @ColumnInfo(name = "risk_level")
     private var riskLevel: String = ScanRisk.SAFE
-) {
+) : Serializable {
 
     fun getId(): Long = id
 
@@ -30,7 +31,31 @@ class ProductScan(
 
     fun getRiskLevel(): String = riskLevel
 
+    /**
+     * Deriva un nombre corto para la UI a partir del texto OCR.
+     * Si no hay un tÃƒÂ­tulo claro, devuelve un fallback amigable.
+     */
+    fun getProductName(): String {
+        val firstLine = detectedText
+            .lineSequence()
+            .map { it.trim() }
+            .firstOrNull { it.isNotBlank() }
+            .orEmpty()
+
+        if (firstLine.isBlank()) return DEFAULT_PRODUCT_NAME
+
+        return if (firstLine.lowercase().startsWith("ingredientes")) {
+            DEFAULT_PRODUCT_NAME
+        } else {
+            firstLine.take(MAX_PRODUCT_NAME_LENGTH)
+        }
+    }
+
     companion object {
+        private const val serialVersionUID: Long = 1L
+        private const val DEFAULT_PRODUCT_NAME = "Producto escaneado"
+        private const val MAX_PRODUCT_NAME_LENGTH = 60
+
         fun crear(
             textoDetectado: String,
             nivelRiesgo: String = ScanRisk.SAFE,

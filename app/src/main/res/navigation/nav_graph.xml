@@ -5,7 +5,6 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
-    <!-- Pantalla inicial: inicio de sesión -->
     <fragment
         android:id="@+id/loginFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.LoginFragment"
@@ -14,7 +13,6 @@
         <action
             android:id="@+id/action_login_to_register"
             app:destination="@id/registerFragment" />
-        <!-- Tras login exitoso: limpia el back stack hasta login y muestra el escáner -->
         <action
             android:id="@+id/action_login_to_scanner"
             app:destination="@id/scannerFragment"
@@ -22,14 +20,12 @@
             app:popUpToInclusive="true" />
     </fragment>
 
-    <!-- Registro con validación y persistencia Room -->
     <fragment
         android:id="@+id/registerFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.RegisterFragment"
         android:label="@string/auth_register_title"
         tools:layout="@layout/fragment_register" />
 
-    <!-- Destino posterior al auth (placeholder hasta integrar ML Kit / CameraX) -->
     <fragment
         android:id="@+id/scannerFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.ScannerFragment"
@@ -43,7 +39,6 @@
             app:destination="@id/scanHistoryFragment" />
     </fragment>
 
-    <!-- Lista negra de alérgenos (formulario + RecyclerView + Room) -->
     <fragment
         android:id="@+id/allergensFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.allergens.AllergensFragment"
@@ -54,5 +49,19 @@
         android:id="@+id/scanHistoryFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.history.ScanHistoryFragment"
         android:label="@string/history_title"
-        tools:layout="@layout/fragment_scan_history" />
+        tools:layout="@layout/fragment_scan_history">
+        <action
+            android:id="@+id/action_scanHistory_to_scanDetail"
+            app:destination="@id/scanDetailFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/scanDetailFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.history.ScanDetailFragment"
+        android:label="@string/history_detail_title"
+        tools:layout="@layout/fragment_scan_detail">
+        <argument
+            android:name="scan"
+            app:argType="unab.edu.co.abrahamcaceres.safebite.model.ProductScan" />
+    </fragment>
 </navigation>
