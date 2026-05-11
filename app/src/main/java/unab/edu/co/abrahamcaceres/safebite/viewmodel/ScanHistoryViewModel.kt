@@ -20,16 +20,22 @@ class ScanHistoryViewModel(
 
     val scans: LiveData<List<ProductScan>> = repository.observeScans()
 
-    /** Inserta un escaneo (p. ej. tras OCR en el escáner). */
-    fun insertScan(detectedText: String, riskLevel: String = ScanRisk.SAFE) {
-        if (detectedText.isBlank()) return
+    /** Inserta un escaneo ya construido desde la capa de presentaciÃ³n. */
+    fun insertScan(scan: ProductScan) {
+        if (scan.getDetectedText().isBlank()) return
         viewModelScope.launch {
-            repository.insert(ProductScan.crear(detectedText, riskLevel))
+            repository.insert(scan)
         }
     }
 
+    /** Inserta un escaneo (p. ej. tras OCR en el escÃ¡ner). */
+    fun insertScan(detectedText: String, riskLevel: String = ScanRisk.SAFE) {
+        if (detectedText.isBlank()) return
+        insertScan(ProductScan.crear(detectedText, riskLevel))
+    }
+
     /**
-     * Datos de demostración para probar el RecyclerView antes de integrar ML Kit.
+     * Datos de demostraciÃ³n para probar el RecyclerView antes de integrar ML Kit.
      */
     fun insertSampleScan() {
         val sample = getApplication<Application>().getString(R.string.history_sample_text)
