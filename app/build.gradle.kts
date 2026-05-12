@@ -43,8 +43,7 @@ android {
 }
 
 dependencies {
-
-    implementation(libs.guava.listenablefuture)
+    implementation(libs.guava.android)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.appcompat)
