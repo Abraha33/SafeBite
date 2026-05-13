@@ -10,9 +10,10 @@ import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.data.repository.UserRepository
 import unab.edu.co.abrahamcaceres.safebite.model.User
 import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
+import unab.edu.co.abrahamcaceres.safebite.utils.SessionManager
 
 /**
- * Lógica de negocio MVVM para Login y Registro (validación + acceso a Room vía repositorio).
+ * LÃ³gica de negocio MVVM para Login y Registro (validaciÃ³n + acceso a Room vÃ­a repositorio).
  */
 class AuthViewModel(
     application: Application,
@@ -20,6 +21,7 @@ class AuthViewModel(
 ) : AndroidViewModel(application) {
 
     private val appContext: Application = application
+    private val sessionManager = SessionManager(application.applicationContext)
 
     private val _nameError = MutableLiveData<String?>(null)
     val nameError: LiveData<String?> = _nameError
@@ -75,7 +77,7 @@ class AuthViewModel(
     }
 
     /**
-     * Valida credenciales y consulta Room para iniciar sesión local.
+     * Valida credenciales y consulta Room para iniciar sesiÃ³n local.
      */
     fun validateAndLogin(email: String, password: String) {
         if (!validateLoginFields(email, password)) return
@@ -83,7 +85,10 @@ class AuthViewModel(
         viewModelScope.launch {
             val result = repository.login(email, password)
             result.fold(
-                onSuccess = { _loginSuccess.postValue(true) },
+                onSuccess = { user ->
+                    sessionManager.saveCurrentUserEmail(user.getEmail())
+                    _loginSuccess.postValue(true)
+                },
                 onFailure = { error ->
                     when (error.message) {
                         UserRepository.CODE_USER_NOT_FOUND ->

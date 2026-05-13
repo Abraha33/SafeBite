@@ -2,13 +2,18 @@ package unab.edu.co.abrahamcaceres.safebite.ui.history
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScanHistoryBinding
 import unab.edu.co.abrahamcaceres.safebite.model.ProductScan
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
@@ -44,6 +49,7 @@ class ScanHistoryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.toolbarHistory.setupWithNavController(findNavController())
+        binding.toolbarHistory.addMenuProvider(HistoryMenuProvider())
 
         binding.rvScanHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvScanHistory.adapter = adapter
@@ -57,6 +63,24 @@ class ScanHistoryFragment : Fragment() {
             val empty = list.isNullOrEmpty()
             binding.textEmptyHistory.visibility = if (empty) View.VISIBLE else View.GONE
             binding.rvScanHistory.visibility = if (empty) View.GONE else View.VISIBLE
+        }
+    }
+
+    private inner class HistoryMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.history_menu, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return when (menuItem.itemId) {
+                R.id.action_profile -> {
+                    findNavController().navigate(
+                        ScanHistoryFragmentDirections.actionScanHistoryToProfile()
+                    )
+                    true
+                }
+                else -> false
+            }
         }
     }
 

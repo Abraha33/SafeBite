@@ -7,8 +7,7 @@ import android.view.ViewGroup
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
+
 import androidx.recyclerview.widget.LinearLayoutManager
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentAllergensBinding
@@ -42,8 +41,6 @@ class AllergensFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        binding.toolbarAllergens.setupWithNavController(findNavController())
 
         binding.rvAllergens.layoutManager = LinearLayoutManager(requireContext())
         binding.rvAllergens.adapter = adapter

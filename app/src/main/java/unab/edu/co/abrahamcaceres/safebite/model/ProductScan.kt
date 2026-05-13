@@ -1,14 +1,17 @@
 package unab.edu.co.abrahamcaceres.safebite.model
 
+import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
 /**
  * Registro de un producto analizado (texto detectado + nivel de riesgo).
- * POO: atributos privados y mÃƒÂ©todos de acceso.
+ * POO: atributos privados y métodos de acceso.
+ * @Parcelize permite pasar el objeto por SafeArgs entre Fragmentos.
  */
+@Parcelize
 @Entity(tableName = "product_scans")
 class ProductScan(
     @PrimaryKey(autoGenerate = true)
@@ -21,7 +24,7 @@ class ProductScan(
     private var detectedText: String = "",
     @ColumnInfo(name = "risk_level")
     private var riskLevel: String = ScanRisk.SAFE
-) : Serializable {
+) : Parcelable {
 
     fun getId(): Long = id
 
@@ -33,7 +36,7 @@ class ProductScan(
 
     /**
      * Deriva un nombre corto para la UI a partir del texto OCR.
-     * Si no hay un tÃƒÂ­tulo claro, devuelve un fallback amigable.
+     * Si no hay un título claro, devuelve un fallback amigable.
      */
     fun getProductName(): String {
         val firstLine = detectedText
@@ -52,7 +55,6 @@ class ProductScan(
     }
 
     companion object {
-        private const val serialVersionUID: Long = 1L
         private const val DEFAULT_PRODUCT_NAME = "Producto escaneado"
         private const val MAX_PRODUCT_NAME_LENGTH = 60
 
@@ -70,3 +72,5 @@ class ProductScan(
         }
     }
 }
+
+

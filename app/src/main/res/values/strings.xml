@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SafeBite</string>
+
     <!-- AutenticaciÃ³n -->
     <string name="auth_login_title">Iniciar sesiÃ³n</string>
     <string name="auth_login_subtitle">Accede con tu correo y contraseÃ±a.</string>
@@ -25,8 +26,10 @@
     <string name="register_ok">Registro guardado correctamente.</string>
     <string name="login_ok">Bienvenido a SafeBite.</string>
 
+    <!-- Scanner -->
     <string name="auth_scanner_title">EscÃ¡ner de etiquetas</string>
     <string name="auth_scanner_body">Apunta la cÃ¡mara a la etiqueta del producto para detectar ingredientes de riesgo en tiempo real.</string>
+    <string name="scanner_open_gallery">Analizar desde galerÃ­a</string>
     <string name="scanner_status_waiting">Buscando texto en la etiquetaâ€¦</string>
     <string name="scanner_status_safe">Producto Seguro</string>
     <string name="scanner_status_danger">Â¡PELIGRO! Contiene %1$s</string>
@@ -35,7 +38,7 @@
     <string name="scanner_status_error">No pudimos analizar la imagen. Intenta enfocar mejor la etiqueta.</string>
     <string name="scanner_preview_cd">Vista previa de la cÃ¡mara para analizar etiquetas</string>
 
-    <!-- AlÃ©rgenos (lista negra) -->
+    <!-- AlÃ©rgenos -->
     <string name="allergens_title">Mi lista negra</string>
     <string name="allergens_subtitle">Agrega ingredientes que la app debe detectar como riesgo en tus etiquetas.</string>
     <string name="allergen_hint">Ej: lactosa, manÃ­, glutenâ€¦</string>
@@ -47,7 +50,7 @@
     <string name="error_allergen_short">Nombre demasiado corto (mÃ­nimo 3 caracteres).</string>
     <string name="error_allergen_duplicate">Ese ingrediente ya estÃ¡ en tu lista.</string>
 
-    <!-- Historial de escaneos -->
+    <!-- Historial -->
     <string name="history_title">Historial de escaneos</string>
     <string name="history_subtitle">Productos que ya analizaste con SafeBite.</string>
     <string name="history_empty">AÃºn no hay escaneos. Cuando uses el escÃ¡ner, aparecerÃ¡n aquÃ­.</string>
@@ -61,6 +64,17 @@
     <string name="history_detail_risk_label">Estado de riesgo</string>
     <string name="history_detail_ingredients_label">Ingredientes detectados por ML Kit</string>
     <string name="history_detail_empty_ingredients">No se detectaron ingredientes legibles en este escaneo.</string>
+
+    <!-- Perfil -->
+    <string name="profile_open_button">Ver perfil</string>
+    <string name="profile_title">Mi perfil</string>
+    <string name="profile_name_label">Nombre del usuario</string>
+    <string name="profile_email_label">Correo registrado</string>
+    <string name="profile_summary_label">Resumen de actividad</string>
+    <string name="profile_scan_summary">%1$d escaneos registrados</string>
+    <string name="profile_logout_button">Cerrar sesiÃ³n</string>
+
+    <!-- Riesgo -->
     <string name="risk_safe">Seguro</string>
     <string name="risk_warning">PrecauciÃ³n</string>
     <string name="risk_danger">Peligro</string>

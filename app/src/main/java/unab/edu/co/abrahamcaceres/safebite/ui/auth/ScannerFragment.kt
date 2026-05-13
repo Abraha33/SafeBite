@@ -1,8 +1,14 @@
 package unab.edu.co.abrahamcaceres.safebite.ui.auth
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,7 +22,6 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -33,14 +38,11 @@ import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModelFactory
 
 /**
- * Pantalla de escaneo en tiempo real.
- *
- * Responsabilidades de presentaciÃ³n:
- * - Solicitar permisos de cÃ¡mara de forma segura.
- * - Vincular CameraX (Preview + ImageAnalysis) al ciclo de vida del Fragment.
- * - Observar los alÃ©rgenos activos desde Room mediante [AllergenViewModel].
- * - Actualizar el HUD segÃºn el resultado del OCR de ML Kit.
- * - Persistir los resultados relevantes en Room a travÃ©s de [ScanHistoryViewModel].
+ * Pantalla principal de anÃ¡lisis:
+ * - CÃ¡mara en tiempo real con CameraX.
+ * - OCR con ML Kit para cÃ¡mara y galerÃ­a.
+ * - Persistencia de resultados en Room.
+ * - HUD reactiva y feedback hÃ¡ptico ante peligro.
  */
 class ScannerFragment : Fragment() {
 
@@ -79,6 +81,12 @@ class ScannerFragment : Fragment() {
             }
         }
 
+    private val galleryLauncher =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { imageUri ->
+            if (!isAdded || imageUri == null) return@registerForActivityResult
+            analyzeGalleryImage(imageUri)
+        }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,18 +102,11 @@ class ScannerFragment : Fragment() {
         cameraExecutor = Executors.newSingleThreadExecutor()
         configurePreview()
         observeAllergens()
+        setupActions()
         renderBanner(
             message = getString(R.string.scanner_status_waiting),
             bannerStyle = BannerStyle.SAFE
         )
-
-        binding.buttonOpenHistory.setOnClickListener {
-            findNavController().navigate(R.id.action_scanner_to_history)
-        }
-        binding.buttonManageAllergens.setOnClickListener {
-            findNavController().navigate(R.id.action_scanner_to_allergens)
-        }
-
         ensureCameraPermissionAndStart()
     }
 
@@ -123,6 +124,12 @@ class ScannerFragment : Fragment() {
         textRecognizer.close()
         if (::cameraExecutor.isInitialized) {
             cameraExecutor.shutdown()
+        }
+    }
+
+    private fun setupActions() {
+        binding.buttonOpenGallery.setOnClickListener {
+            galleryLauncher.launch("image/*")
         }
     }
 
@@ -192,13 +199,10 @@ class ScannerFragment : Fragment() {
         val analysis = ImageAnalysis.Builder()
             .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
             .build()
-            .also { analysis ->
-                analysis.setAnalyzer(
+            .also { useCase ->
+                useCase.setAnalyzer(
                     cameraExecutor,
-                    LabelTextAnalyzer(
-                        onTextDetected = ::handleRecognizedText,
-                        onAnalysisError = ::handleAnalysisError
-                    )
+                    LabelTextAnalyzer()
                 )
             }
         imageAnalysis = analysis
@@ -210,6 +214,29 @@ class ScannerFragment : Fragment() {
             preview,
             analysis
         )
+    }
+
+    private fun analyzeGalleryImage(imageUri: Uri) {
+        runCatching {
+            InputImage.fromFilePath(requireContext(), imageUri)
+        }.onSuccess { image ->
+            processImage(image)
+        }.onFailure { throwable ->
+            handleAnalysisError(throwable as? Exception ?: RuntimeException(throwable))
+        }
+    }
+
+    private fun processImage(image: InputImage, onComplete: (() -> Unit)? = null) {
+        textRecognizer.process(image)
+            .addOnSuccessListener { visionText ->
+                handleRecognizedText(visionText.text)
+            }
+            .addOnFailureListener { throwable ->
+                handleAnalysisError(Exception(throwable))
+            }
+            .addOnCompleteListener {
+                onComplete?.invoke()
+            }
     }
 
     private fun handleRecognizedText(recognizedText: String) {
@@ -269,8 +296,7 @@ class ScannerFragment : Fragment() {
     }
 
     /**
-     * Evita llenar el historial con cientos de filas idÃ©nticas cuando la cÃ¡mara mantiene
-     * el mismo encuadre durante varios frames consecutivos.
+     * Evita duplicados consecutivos y dispara vibraciÃ³n sÃ³lo ante un peligro nuevo.
      */
     private fun persistScanIfNeeded(detectedText: String, riskLevel: String) {
         val normalizedText = detectedText.trim().lowercase(Locale.getDefault())
@@ -280,12 +306,30 @@ class ScannerFragment : Fragment() {
         if (fingerprint == lastPersistedFingerprint) return
 
         lastPersistedFingerprint = fingerprint
+        if (riskLevel == ScanRisk.DANGER) {
+            vibrateDangerFeedback()
+        }
+
         scanHistoryViewModel.insertScan(
             ProductScan.crear(
                 textoDetectado = detectedText,
                 nivelRiesgo = riskLevel
             )
         )
+    }
+
+    private fun vibrateDangerFeedback() {
+        val vibrationEffect = VibrationEffect.createOneShot(180L, VibrationEffect.DEFAULT_AMPLITUDE)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator.vibrate(vibrationEffect)
+        } else {
+            @Suppress("DEPRECATION")
+            val vibrator = requireContext().getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(vibrationEffect)
+        }
     }
 
     private fun renderBanner(message: String, bannerStyle: BannerStyle) {
@@ -325,15 +369,10 @@ class ScannerFragment : Fragment() {
     }
 
     /**
-     * Adaptador entre CameraX y ML Kit.
-     *
-     * Se limita a extraer el texto completo del frame y delegar la decisiÃ³n de negocio
-     * al [ScannerFragment], para mantener la UI desacoplada del OCR.
+     * Puente entre CameraX y ML Kit. El anÃ¡lisis de negocio queda centralizado
+     * para reutilizar exactamente la misma lÃ³gica con imÃ¡genes de galerÃ­a.
      */
-    private inner class LabelTextAnalyzer(
-        private val onTextDetected: (String) -> Unit,
-        private val onAnalysisError: (Exception) -> Unit
-    ) : ImageAnalysis.Analyzer {
+    private inner class LabelTextAnalyzer : ImageAnalysis.Analyzer {
 
         override fun analyze(imageProxy: ImageProxy) {
             val mediaImage = imageProxy.image
@@ -347,16 +386,9 @@ class ScannerFragment : Fragment() {
                 imageProxy.imageInfo.rotationDegrees
             )
 
-            textRecognizer.process(image)
-                .addOnSuccessListener { visionText ->
-                    onTextDetected(visionText.text)
-                }
-                .addOnFailureListener { throwable ->
-                    onAnalysisError(Exception(throwable))
-                }
-                .addOnCompleteListener {
-                    imageProxy.close()
-                }
+            processImage(image) {
+                imageProxy.close()
+            }
         }
     }
 }

@@ -8,11 +8,11 @@ import unab.edu.co.abrahamcaceres.safebite.utils.PasswordHasher
 import java.util.Locale
 
 /**
- * Capa de repositorio: centraliza las operaciones de autenticación sobre Room.
+ * Capa de repositorio: centraliza las operaciones de autenticaciÃ³n sobre Room.
  */
 class UserRepository(private val userDao: UserDao) {
 
-    /** Registra un usuario si el correo no existe aún. */
+    /** Registra un usuario si el correo no existe aÃºn. */
     suspend fun register(user: User): Result<Long> = withContext(Dispatchers.IO) {
         val existente = userDao.getUserByEmail(user.getEmail())
         if (existente != null) {
@@ -33,6 +33,10 @@ class UserRepository(private val userDao: UserDao) {
             }
             Result.success(usuario)
         }
+
+    suspend fun getByEmail(email: String): User? = withContext(Dispatchers.IO) {
+        userDao.getUserByEmail(email.trim().lowercase(Locale.getDefault()))
+    }
 
     companion object {
         const val CODE_EMAIL_EXISTS = "EMAIL_EXISTS"

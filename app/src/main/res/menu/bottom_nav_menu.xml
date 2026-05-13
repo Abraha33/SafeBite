@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/scannerFragment"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="@string/auth_scanner_title" />
+    <item
+        android:id="@+id/scanHistoryFragment"
+        android:icon="@android:drawable/ic_menu_recent_history"
+        android:title="@string/history_title" />
+    <item
+        android:id="@+id/allergensFragment"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
+        android:title="@string/allergens_title" />
+</menu>
