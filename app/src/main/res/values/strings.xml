@@ -46,6 +46,7 @@
     <string name="allergens_open_button">Gestionar alÃ©rgenos</string>
     <string name="allergens_empty">AÃºn no tienes alÃ©rgenos. Agrega el primero arriba.</string>
     <string name="allergen_delete_cd">Eliminar alÃ©rgeno</string>
+    <string name="allergens_empty_cd">Sin alÃ©rgenos aÃºn</string>
     <string name="error_allergen_empty">El nombre no puede estar vacÃ­o.</string>
     <string name="error_allergen_short">Nombre demasiado corto (mÃ­nimo 3 caracteres).</string>
     <string name="error_allergen_duplicate">Ese ingrediente ya estÃ¡ en tu lista.</string>
@@ -73,6 +74,10 @@
     <string name="profile_summary_label">Resumen de actividad</string>
     <string name="profile_scan_summary">%1$d escaneos registrados</string>
     <string name="profile_logout_button">Cerrar sesiÃ³n</string>
+    <string name="profile_avatar_cd">Foto de perfil</string>
+
+    <!-- Historial - vacÃ­o -->
+    <string name="history_empty_cd">Sin escaneos aÃºn</string>
 
     <!-- Riesgo -->
     <string name="risk_safe">Seguro</string>

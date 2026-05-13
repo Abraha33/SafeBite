@@ -61,7 +61,7 @@ class ScanHistoryFragment : Fragment() {
         viewModel.scans.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
             val empty = list.isNullOrEmpty()
-            binding.textEmptyHistory.visibility = if (empty) View.VISIBLE else View.GONE
+            binding.layoutEmptyHistory.visibility = if (empty) View.VISIBLE else View.GONE
             binding.rvScanHistory.visibility = if (empty) View.GONE else View.VISIBLE
         }
     }

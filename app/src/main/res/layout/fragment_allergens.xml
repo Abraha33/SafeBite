@@ -66,14 +66,30 @@
                 android:paddingBottom="8dp"
                 tools:listitem="@layout/item_allergen" />
 
-            <TextView
-                android:id="@+id/textEmptyAllergens"
+            <LinearLayout
+                android:id="@+id/layoutEmptyAllergens"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="@string/allergens_empty"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:visibility="gone" />
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@android:drawable/ic_menu_sort_by_size"
+                    android:contentDescription="@string/allergens_empty_cd"
+                    android:alpha="0.4" />
+
+                <TextView
+                    android:id="@+id/textEmptyAllergens"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center"
+                    android:text="@string/allergens_empty"
+                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+            </LinearLayout>
         </FrameLayout>
     </LinearLayout>
 </LinearLayout>

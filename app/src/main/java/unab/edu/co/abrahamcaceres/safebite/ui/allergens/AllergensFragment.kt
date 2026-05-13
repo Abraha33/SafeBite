@@ -58,7 +58,7 @@ class AllergensFragment : Fragment() {
         viewModel.allergens.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
             val empty = list.isNullOrEmpty()
-            binding.textEmptyAllergens.visibility = if (empty) View.VISIBLE else View.GONE
+            binding.layoutEmptyAllergens.visibility = if (empty) View.VISIBLE else View.GONE
             binding.rvAllergens.visibility = if (empty) View.GONE else View.VISIBLE
         }
 

@@ -9,6 +9,12 @@
         <item name="android:statusBarColor">?attr/colorPrimary</item>
     </style>
 
+    <!-- Avatar circular con ShapeableImageView -->
+    <style name="ShapeAppearanceOverlay.Avatar.Circle" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
+    </style>
+
     <!-- Pantalla de arranque (Android 12+ con compat hacia atrás vía androidx.core:core-splashscreen). -->
     <style name="Theme.SafeBite.Splash" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">@color/splash_background</item>
