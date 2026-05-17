@@ -19,4 +19,7 @@ interface UserDao {
     /** Busca un usuario por correo (debe coincidir con el valor normalizado guardado). */
     @Query("SELECT * FROM users WHERE email = :email LIMIT 1")
     suspend fun getUserByEmail(email: String): User?
+
+    @Query("SELECT COUNT(*) FROM users")
+    suspend fun getUserCount(): Int
 }

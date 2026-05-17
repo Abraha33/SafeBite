@@ -38,6 +38,11 @@ class UserRepository(private val userDao: UserDao) {
         userDao.getUserByEmail(email.trim().lowercase(Locale.getDefault()))
     }
 
+    /** Retorna la cantidad de usuarios registrados en Room. */
+    suspend fun getLoggedUserCount(): Int = withContext(Dispatchers.IO) {
+        userDao.getUserCount()
+    }
+
     companion object {
         const val CODE_EMAIL_EXISTS = "EMAIL_EXISTS"
         const val CODE_USER_NOT_FOUND = "USER_NOT_FOUND"

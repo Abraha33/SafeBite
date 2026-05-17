@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScanHistoryBinding
 import unab.edu.co.abrahamcaceres.safebite.model.ProductScan
@@ -73,6 +74,10 @@ class ScanHistoryFragment : Fragment() {
 
         override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
             return when (menuItem.itemId) {
+                R.id.action_clear_history -> {
+                    showClearHistoryDialog()
+                    true
+                }
                 R.id.action_profile -> {
                     findNavController().navigate(
                         ScanHistoryFragmentDirections.actionScanHistoryToProfile()
@@ -82,6 +87,19 @@ class ScanHistoryFragment : Fragment() {
                 else -> false
             }
         }
+    }
+
+    private fun showClearHistoryDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.history_clear_title)
+            .setMessage(R.string.history_clear)
+            .setPositiveButton(R.string.history_clear_confirm) { _, _ ->
+                viewModel.clearHistory()
+            }
+            .setNegativeButton(R.string.history_clear_cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun onScanItemClick(scan: ProductScan) {

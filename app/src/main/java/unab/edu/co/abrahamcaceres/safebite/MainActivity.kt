@@ -13,6 +13,8 @@ import unab.edu.co.abrahamcaceres.safebite.databinding.ActivityMainBinding
  * Actividad única que hospeda el [NavHostFragment] con BottomNavigationView.
  * La BottomNav permite navegar entre Scanner, Historial y Alérgenos.
  * Se oculta automáticamente en pantallas de autenticación y detalle.
+ * Soporta arranque dinámico: si SplashActivity envía un START_DESTINATION,
+ * el NavController se configura para comenzar allí (usuario autenticado).
  */
 class MainActivity : AppCompatActivity() {
 
@@ -27,6 +29,15 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
+
+        val startDest = intent.getIntExtra(
+            SplashActivity.START_DESTINATION_EXTRA, -1
+        )
+        if (startDest != -1) {
+            val navGraph = navController.navInflater.inflate(R.navigation.nav_graph)
+            navGraph.setStartDestination(startDest)
+            navController.graph = navGraph
+        }
 
         setupBottomNav()
         observeNavChanges()

@@ -21,4 +21,7 @@ interface ProductScanDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun insert(scan: ProductScan): Long
+
+    @Query("DELETE FROM product_scans")
+    suspend fun deleteAll(): Int
 }

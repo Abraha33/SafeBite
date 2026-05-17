@@ -34,6 +34,13 @@ class ScanHistoryViewModel(
         insertScan(ProductScan.crear(detectedText, riskLevel))
     }
 
+    /** Elimina todo el historial de escaneos de Room. */
+    fun clearHistory() {
+        viewModelScope.launch {
+            repository.deleteAll()
+        }
+    }
+
     /**
      * Datos de demostraciÃ³n para probar el RecyclerView antes de integrar ML Kit.
      */

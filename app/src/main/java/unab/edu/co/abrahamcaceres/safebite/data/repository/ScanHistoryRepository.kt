@@ -20,4 +20,8 @@ class ScanHistoryRepository(private val productScanDao: ProductScanDao) {
     suspend fun getById(id: Long): ProductScan? = withContext(Dispatchers.IO) {
         productScanDao.getById(id)
     }
+
+    suspend fun deleteAll(): Result<Int> = withContext(Dispatchers.IO) {
+        runCatching { productScanDao.deleteAll() }
+    }
 }

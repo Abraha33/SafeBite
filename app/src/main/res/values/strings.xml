@@ -1,67 +1,67 @@
 <resources>
     <string name="app_name">SafeBite</string>
 
-    <!-- AutenticaciÃ³n -->
-    <string name="auth_login_title">Iniciar sesiÃ³n</string>
-    <string name="auth_login_subtitle">Accede con tu correo y contraseÃ±a.</string>
+    <!-- Autenticación -->
+    <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_login_subtitle">Accede con tu correo y contraseña.</string>
     <string name="auth_register_title">Crear cuenta</string>
-    <string name="auth_register_subtitle">RegÃ­strate para guardar tu perfil de forma local.</string>
+    <string name="auth_register_subtitle">Regístrate para guardar tu perfil de forma local.</string>
     <string name="auth_field_name">Nombre completo</string>
-    <string name="auth_field_email">Correo electrÃ³nico</string>
-    <string name="auth_field_password">ContraseÃ±a</string>
+    <string name="auth_field_email">Correo electrónico</string>
+    <string name="auth_field_password">Contraseña</string>
     <string name="auth_action_login">Entrar</string>
     <string name="auth_action_register">Registrarme</string>
-    <string name="auth_action_go_register">Â¿No tienes cuenta? RegÃ­strate</string>
+    <string name="auth_action_go_register">¿No tienes cuenta? Regístrate</string>
     <string name="auth_action_go_login">Ya tengo cuenta</string>
 
     <string name="error_required">Este campo es obligatorio.</string>
-    <string name="error_email_invalid">Introduce un correo con formato vÃ¡lido.</string>
-    <string name="error_password_short">La contraseÃ±a debe tener al menos 6 caracteres.</string>
+    <string name="error_email_invalid">Introduce un correo con formato válido.</string>
+    <string name="error_password_short">La contraseña debe tener al menos 6 caracteres.</string>
     <string name="error_name_short">El nombre debe tener al menos 2 caracteres.</string>
-    <string name="error_email_registered">Ese correo ya estÃ¡ registrado.</string>
+    <string name="error_email_registered">Ese correo ya está registrado.</string>
     <string name="error_user_not_found">No existe una cuenta con ese correo.</string>
-    <string name="error_bad_password">La contraseÃ±a no coincide.</string>
-    <string name="error_unknown">OcurriÃ³ un error. Intenta de nuevo.</string>
+    <string name="error_bad_password">La contraseña no coincide.</string>
+    <string name="error_unknown">Ocurrió un error. Intenta de nuevo.</string>
 
     <string name="register_ok">Registro guardado correctamente.</string>
     <string name="login_ok">Bienvenido a SafeBite.</string>
 
     <!-- Scanner -->
-    <string name="auth_scanner_title">EscÃ¡ner de etiquetas</string>
-    <string name="auth_scanner_body">Apunta la cÃ¡mara a la etiqueta del producto para detectar ingredientes de riesgo en tiempo real.</string>
-    <string name="scanner_open_gallery">Analizar desde galerÃ­a</string>
-    <string name="scanner_status_waiting">Buscando texto en la etiquetaâ€¦</string>
+    <string name="auth_scanner_title">Escáner de etiquetas</string>
+    <string name="auth_scanner_body">Apunta la cámara a la etiqueta del producto para detectar ingredientes de riesgo en tiempo real.</string>
+    <string name="scanner_open_gallery">Analizar desde galería</string>
+    <string name="scanner_status_waiting">Buscando texto en la etiqueta…</string>
     <string name="scanner_status_safe">Producto Seguro</string>
-    <string name="scanner_status_danger">Â¡PELIGRO! Contiene %1$s</string>
-    <string name="scanner_status_permission_required">Necesitamos permiso de cÃ¡mara para analizar la etiqueta.</string>
-    <string name="scanner_status_permission_denied">Sin permiso de cÃ¡mara no podemos iniciar el escÃ¡ner.</string>
+    <string name="scanner_status_danger">¡PELIGRO! Contiene %1$s</string>
+    <string name="scanner_status_permission_required">Necesitamos permiso de cámara para analizar la etiqueta.</string>
+    <string name="scanner_status_permission_denied">Sin permiso de cámara no podemos iniciar el escáner.</string>
     <string name="scanner_status_error">No pudimos analizar la imagen. Intenta enfocar mejor la etiqueta.</string>
-    <string name="scanner_preview_cd">Vista previa de la cÃ¡mara para analizar etiquetas</string>
+    <string name="scanner_preview_cd">Vista previa de la cámara para analizar etiquetas</string>
 
-    <!-- AlÃ©rgenos -->
+    <!-- Alérgenos -->
     <string name="allergens_title">Mi lista negra</string>
     <string name="allergens_subtitle">Agrega ingredientes que la app debe detectar como riesgo en tus etiquetas.</string>
-    <string name="allergen_hint">Ej: lactosa, manÃ­, glutenâ€¦</string>
+    <string name="allergen_hint">Ej: lactosa, maní, gluten…</string>
     <string name="allergen_add_button">Agregar a mi lista</string>
-    <string name="allergens_open_button">Gestionar alÃ©rgenos</string>
-    <string name="allergens_empty">AÃºn no tienes alÃ©rgenos. Agrega el primero arriba.</string>
-    <string name="allergen_delete_cd">Eliminar alÃ©rgeno</string>
-    <string name="allergens_empty_cd">Sin alÃ©rgenos aÃºn</string>
-    <string name="error_allergen_empty">El nombre no puede estar vacÃ­o.</string>
-    <string name="error_allergen_short">Nombre demasiado corto (mÃ­nimo 3 caracteres).</string>
-    <string name="error_allergen_duplicate">Ese ingrediente ya estÃ¡ en tu lista.</string>
+    <string name="allergens_open_button">Gestionar alérgenos</string>
+    <string name="allergens_empty">Aún no tienes alérgenos. Agrega el primero arriba.</string>
+    <string name="allergen_delete_cd">Eliminar alérgeno</string>
+    <string name="allergens_empty_cd">Sin alérgenos aún</string>
+    <string name="error_allergen_empty">El nombre no puede estar vacío.</string>
+    <string name="error_allergen_short">Nombre demasiado corto (mínimo 3 caracteres).</string>
+    <string name="error_allergen_duplicate">Ese ingrediente ya está en tu lista.</string>
 
     <!-- Historial -->
     <string name="history_title">Historial de escaneos</string>
     <string name="history_subtitle">Productos que ya analizaste con SafeBite.</string>
-    <string name="history_empty">AÃºn no hay escaneos. Cuando uses el escÃ¡ner, aparecerÃ¡n aquÃ­.</string>
+    <string name="history_empty">Aún no hay escaneos. Cuando uses el escáner, aparecerán aquí.</string>
     <string name="history_add_sample">Agregar escaneo de ejemplo</string>
-    <string name="history_sample_text">Ingredientes: leche en polvo, manÃ­, trigo (gluten), soya. Puede contener trazas de nuez.</string>
-    <string name="history_item_click_hint">Escaneo #%1$s â€” en la pÃ¡gina 4 verÃ¡s el detalle completo.</string>
+    <string name="history_sample_text">Ingredientes: leche en polvo, maní, trigo (gluten), soya. Puede contener trazas de nuez.</string>
+    <string name="history_item_click_hint">Escaneo #%1$s — en la página 4 verás el detalle completo.</string>
     <string name="history_open_button">Ver historial</string>
     <string name="history_detail_title">Detalle del escaneo</string>
     <string name="history_detail_product_label">Producto detectado</string>
-    <string name="history_detail_date_label">Fecha del anÃ¡lisis</string>
+    <string name="history_detail_date_label">Fecha del análisis</string>
     <string name="history_detail_risk_label">Estado de riesgo</string>
     <string name="history_detail_ingredients_label">Ingredientes detectados por ML Kit</string>
     <string name="history_detail_empty_ingredients">No se detectaron ingredientes legibles en este escaneo.</string>
@@ -73,14 +73,18 @@
     <string name="profile_email_label">Correo registrado</string>
     <string name="profile_summary_label">Resumen de actividad</string>
     <string name="profile_scan_summary">%1$d escaneos registrados</string>
-    <string name="profile_logout_button">Cerrar sesiÃ³n</string>
+    <string name="profile_logout_button">Cerrar sesión</string>
     <string name="profile_avatar_cd">Foto de perfil</string>
 
-    <!-- Historial - vacÃ­o -->
-    <string name="history_empty_cd">Sin escaneos aÃºn</string>
+    <!-- Historial - vacío -->
+    <string name="history_empty_cd">Sin escaneos aún</string>
+    <string name="history_clear">Borrar todo el historial</string>
+    <string name="history_clear_title">¿Deseas borrar todo tu historial?</string>
+    <string name="history_clear_confirm">Sí, borrar todo</string>
+    <string name="history_clear_cancel">Cancelar</string>
 
     <!-- Riesgo -->
     <string name="risk_safe">Seguro</string>
-    <string name="risk_warning">PrecauciÃ³n</string>
+    <string name="risk_warning">Precaución</string>
     <string name="risk_danger">Peligro</string>
 </resources>
