@@ -30,13 +30,24 @@
     <string name="auth_scanner_title">Escáner de etiquetas</string>
     <string name="auth_scanner_body">Apunta la cámara a la etiqueta del producto para detectar ingredientes de riesgo en tiempo real.</string>
     <string name="scanner_open_gallery">Analizar desde galería</string>
-    <string name="scanner_status_waiting">Buscando texto en la etiqueta…</string>
+    <string name="scanner_status_waiting">SISTEMA DE ESCANEO ACTIVO</string>
+    <string name="scanner_status_waiting_sub">Analizando texto de la etiqueta… Apunta directamente a la tabla de ingredientes del empaque.</string>
     <string name="scanner_status_safe">Producto Seguro</string>
     <string name="scanner_status_danger">¡PELIGRO! Contiene %1$s</string>
-    <string name="scanner_status_permission_required">Necesitamos permiso de cámara para analizar la etiqueta.</string>
-    <string name="scanner_status_permission_denied">Sin permiso de cámara no podemos iniciar el escáner.</string>
-    <string name="scanner_status_error">No pudimos analizar la imagen. Intenta enfocar mejor la etiqueta.</string>
+    <string name="scanner_status_permission_required">Necesitamos permiso de cámara</string>
+    <string name="scanner_status_permission_body">Para analizar las etiquetas en tiempo real necesitamos acceso a la cámara.</string>
+    <string name="scanner_status_permission_denied">Permiso de cámara denegado</string>
+    <string name="scanner_status_error">Error de análisis</string>
     <string name="scanner_preview_cd">Vista previa de la cámara para analizar etiquetas</string>
+
+    <!-- Scanner HUD dinámico -->
+    <string name="hud_waiting_title">SISTEMA DE ESCANEO ACTIVO</string>
+    <string name="hud_waiting_message">Analizando texto de la etiqueta… Apunta directamente a la tabla de ingredientes del empaque.</string>
+    <string name="hud_safe_title">PRODUCTO VERIFICADO SEGURO</string>
+    <string name="hud_safe_message">0 coincidencias de alérgenos detectadas. Este artículo es seguro según tus preferencias dietéticas.</string>
+    <string name="hud_danger_title">ALÉRGENO CRÍTICO DETECTADO</string>
+    <string name="hud_danger_message">¡ALERTA! El procesador de IA identificó %1$s en los ingredientes. No se recomienda consumir este producto.</string>
+    <string name="hud_error_message">No pudimos analizar la imagen. Intenta enfocar mejor la etiqueta o usa la galería.</string>
 
     <!-- Alérgenos -->
     <string name="allergens_title">Mi lista negra</string>
@@ -82,6 +93,14 @@
     <string name="history_clear_title">¿Deseas borrar todo tu historial?</string>
     <string name="history_clear_confirm">Sí, borrar todo</string>
     <string name="history_clear_cancel">Cancelar</string>
+
+    <!-- Veredicto detalle -->
+    <string name="verdict_safe_title">PRODUCTO VERIFICADO SEGURO</string>
+    <string name="verdict_safe_body">No se encontraron coincidencias de riesgo. Apto para tu perfil de alérgenos.</string>
+    <string name="verdict_warning_title">ADVERTENCIA DE TRAZAS</string>
+    <string name="verdict_warning_body">Se detectaron posibles trazas o derivados de compuestos de riesgo. Revisa la lista completa.</string>
+    <string name="verdict_danger_title">ALÉRGENO CRÍTICO DETECTADO</string>
+    <string name="verdict_danger_body">Este producto contiene ingredientes explícitos en tu lista negra. ¡Evita su consumo!</string>
 
     <!-- Riesgo -->
     <string name="risk_safe">Seguro</string>

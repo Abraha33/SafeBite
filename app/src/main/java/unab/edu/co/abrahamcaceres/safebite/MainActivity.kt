@@ -4,18 +4,12 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import unab.edu.co.abrahamcaceres.safebite.databinding.ActivityMainBinding
 
-/**
- * Actividad única que hospeda el [NavHostFragment] con BottomNavigationView.
- * La BottomNav permite navegar entre Scanner, Historial y Alérgenos.
- * Se oculta automáticamente en pantallas de autenticación y detalle.
- * Soporta arranque dinámico: si SplashActivity envía un START_DESTINATION,
- * el NavController se configura para comenzar allí (usuario autenticado).
- */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -44,7 +38,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        binding.bottomNav.setupWithNavController(navController)
+        val navOptions = NavOptions.Builder()
+            .setEnterAnim(R.anim.nav_enter)
+            .setExitAnim(R.anim.nav_exit)
+            .setPopEnterAnim(R.anim.fade_in)
+            .setPopExitAnim(R.anim.fade_out)
+            .setLaunchSingleTop(true)
+            .build()
+
+        binding.bottomNav.setOnItemSelectedListener { item ->
+            navController.navigate(item.itemId, null, navOptions)
+            true
+        }
     }
 
     private fun observeNavChanges() {
@@ -53,9 +58,9 @@ class MainActivity : AppCompatActivity() {
                 R.id.loginFragment,
                 R.id.registerFragment,
                 R.id.scanDetailFragment -> View.GONE
-
                 else -> View.VISIBLE
             }
+            binding.bottomNav.menu.findItem(destination.id)?.isChecked = true
         }
     }
 }

@@ -103,7 +103,7 @@ class ScanHistoryFragment : Fragment() {
     }
 
     private fun onScanItemClick(scan: ProductScan) {
-        val action = ScanHistoryFragmentDirections.actionScanHistoryToScanDetail(scan)
+        val action = ScanHistoryFragmentDirections.actionHistoryToDetail(scan.getId())
         findNavController().navigate(action)
     }
 

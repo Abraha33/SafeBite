@@ -6,27 +6,30 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScanDetailBinding
-import unab.edu.co.abrahamcaceres.safebite.model.ProductScan
 import unab.edu.co.abrahamcaceres.safebite.model.ScanRisk
+import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
+import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModelFactory
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-/**
- * Detalle de un escaneo persistido en Room.
- * Consume el objeto completo mediante Safe Args para mantener navegaciÃ³n type-safe.
- */
 class ScanDetailFragment : Fragment() {
 
     private var _binding: FragmentScanDetailBinding? = null
     private val binding get() = _binding!!
+
     private val args: ScanDetailFragmentArgs by navArgs()
+
+    private val viewModel: ScanHistoryViewModel by viewModels {
+        ScanHistoryViewModelFactory(requireActivity().application)
+    }
 
     private val dateFormatter: DateTimeFormatter =
         DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy, HH:mm", Locale.forLanguageTag("es-ES"))
@@ -43,59 +46,53 @@ class ScanDetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.toolbarScanDetail.setupWithNavController(findNavController())
-        bindScan(args.scan)
-    }
 
-    private fun bindScan(scan: ProductScan) {
-        binding.textProductName.text = scan.getProductName()
-        binding.textProductDate.text = dateFormatter.format(Instant.ofEpochMilli(scan.getCreatedAtMs()))
-        binding.textRiskValue.text = resolveRiskText(scan.getRiskLevel())
-        binding.textIngredientsValue.text = buildIngredientsList(scan.getDetectedText())
-        bindRiskIcon(scan.getRiskLevel())
-    }
+        binding.toolbarDetail.setupWithNavController(findNavController())
 
-    private fun bindRiskIcon(riskLevel: String) {
-        val iconRes = when (riskLevel) {
-            ScanRisk.DANGER -> android.R.drawable.presence_busy
-            ScanRisk.WARNING -> android.R.drawable.presence_away
-            else -> android.R.drawable.presence_online
-        }
+        val scanId = args.scanId
 
-        val tintRes = when (riskLevel) {
-            ScanRisk.DANGER -> R.color.risk_danger_on
-            ScanRisk.WARNING -> R.color.risk_warning_on
-            else -> R.color.risk_safe_on
-        }
-
-        binding.imageRiskState.setImageResource(iconRes)
-        binding.imageRiskState.setColorFilter(ContextCompat.getColor(requireContext(), tintRes))
-    }
-
-    private fun resolveRiskText(riskLevel: String): String {
-        return when (riskLevel) {
-            ScanRisk.DANGER -> getString(R.string.risk_danger)
-            ScanRisk.WARNING -> getString(R.string.risk_warning)
-            else -> getString(R.string.risk_safe)
-        }
-    }
-
-    private fun buildIngredientsList(detectedText: String): String {
-        val tokens = detectedText
-            .replace("\r", "")
-            .split("\n", ",")
-            .map { token ->
-                token
-                    .trim()
-                    .removePrefix("Ingredientes:")
-                    .removePrefix("ingredientes:")
-                    .trim()
+        viewModel.scans.observe(viewLifecycleOwner) { list ->
+            val scan = list.find { it.getId() == scanId }
+            scan?.let { item ->
+                bindVerdict(item.getRiskLevel())
+                binding.textScanDate.text = dateFormatter.format(
+                    Instant.ofEpochMilli(item.getCreatedAtMs())
+                )
+                binding.textRawOcr.text = item.getDetectedText()
             }
-            .filter { it.isNotBlank() }
+        }
+    }
 
-        if (tokens.isEmpty()) return getString(R.string.history_detail_empty_ingredients)
+    private fun bindVerdict(riskLevel: String) {
+        val ctx = requireContext()
+        val (bgRes, textColorRes, title, description) = when (riskLevel) {
+            ScanRisk.DANGER -> arrayOf(
+                R.color.risk_danger_container,
+                R.color.risk_danger_on,
+                getString(R.string.verdict_danger_title),
+                getString(R.string.verdict_danger_body)
+            )
+            ScanRisk.WARNING -> arrayOf(
+                R.color.risk_warning_container,
+                R.color.risk_warning_on,
+                getString(R.string.verdict_warning_title),
+                getString(R.string.verdict_warning_body)
+            )
+            else -> arrayOf(
+                R.color.risk_safe_container,
+                R.color.risk_safe_on,
+                getString(R.string.verdict_safe_title),
+                getString(R.string.verdict_safe_body)
+            )
+        }
 
-        return tokens.joinToString(separator = "\n") { ingredient -> "\u2022 $ingredient" }
+        binding.cardVerdictContainer.setCardBackgroundColor(
+            ContextCompat.getColor(ctx, bgRes as Int)
+        )
+        binding.textVerdictTitle.text = title as String
+        binding.textVerdictTitle.setTextColor(ContextCompat.getColor(ctx, textColorRes as Int))
+        binding.textVerdictDescription.text = description as String
+        binding.textVerdictDescription.setTextColor(ContextCompat.getColor(ctx, textColorRes))
     }
 
     override fun onDestroyView() {

@@ -44,7 +44,7 @@
         android:label="@string/history_title"
         tools:layout="@layout/fragment_scan_history">
         <action
-            android:id="@+id/action_scanHistory_to_scanDetail"
+            android:id="@+id/action_history_to_detail"
             app:destination="@id/scanDetailFragment" />
         <action
             android:id="@+id/action_scanHistory_to_profile"
@@ -57,8 +57,8 @@
         android:label="@string/history_detail_title"
         tools:layout="@layout/fragment_scan_detail">
         <argument
-            android:name="scan"
-            app:argType="unab.edu.co.abrahamcaceres.safebite.model.ProductScan" />
+            android:name="scanId"
+            app:argType="long" />
     </fragment>
 
     <fragment

@@ -1,6 +1,8 @@
 package unab.edu.co.abrahamcaceres.safebite.ui.auth
 
 import android.Manifest
+import android.animation.ArgbEvaluator
+import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -37,13 +39,6 @@ import unab.edu.co.abrahamcaceres.safebite.viewmodel.AllergenViewModelFactory
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModelFactory
 
-/**
- * Pantalla principal de anÃ¡lisis:
- * - CÃ¡mara en tiempo real con CameraX.
- * - OCR con ML Kit para cÃ¡mara y galerÃ­a.
- * - Persistencia de resultados en Room.
- * - HUD reactiva y feedback hÃ¡ptico ante peligro.
- */
 class ScannerFragment : Fragment() {
 
     private var _binding: FragmentScannerBinding? = null
@@ -70,13 +65,14 @@ class ScannerFragment : Fragment() {
     private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (!isAdded) return@registerForActivityResult
-
             if (granted) {
                 startCameraFlow()
             } else {
-                renderBanner(
-                    message = getString(R.string.scanner_status_permission_denied),
-                    bannerStyle = BannerStyle.WARNING
+                renderDynamicHUD(
+                    icon = "\uD83D\uDEAB",
+                    title = getString(R.string.scanner_status_permission_denied),
+                    message = getString(R.string.scanner_status_permission_body),
+                    style = HudStyle.WARNING
                 )
             }
         }
@@ -103,9 +99,11 @@ class ScannerFragment : Fragment() {
         configurePreview()
         observeAllergens()
         setupActions()
-        renderBanner(
-            message = getString(R.string.scanner_status_waiting),
-            bannerStyle = BannerStyle.SAFE
+        renderDynamicHUD(
+            icon = "\uD83D\uDEE1\uFE0F",
+            title = getString(R.string.hud_waiting_title),
+            message = getString(R.string.hud_waiting_message),
+            style = HudStyle.SAFE
         )
         ensureCameraPermissionAndStart()
     }
@@ -159,10 +157,11 @@ class ScannerFragment : Fragment() {
             startCameraFlow()
             return
         }
-
-        renderBanner(
-            message = getString(R.string.scanner_status_permission_required),
-            bannerStyle = BannerStyle.WARNING
+        renderDynamicHUD(
+            icon = "\uD83D\uDCF7",
+            title = getString(R.string.scanner_status_permission_required),
+            message = getString(R.string.scanner_status_permission_body),
+            style = HudStyle.WARNING
         )
         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
@@ -245,9 +244,11 @@ class ScannerFragment : Fragment() {
 
         if (normalizedText.isBlank()) {
             currentBinding.root.post {
-                renderBanner(
-                    message = getString(R.string.scanner_status_waiting),
-                    bannerStyle = BannerStyle.SAFE
+                renderDynamicHUD(
+                    icon = "\uD83D\uDEE1\uFE0F",
+                    title = getString(R.string.hud_waiting_title),
+                    message = getString(R.string.hud_waiting_message),
+                    style = HudStyle.SAFE
                 )
             }
             return
@@ -260,21 +261,23 @@ class ScannerFragment : Fragment() {
 
         currentBinding.root.post {
             if (detectedAllergens.isNotEmpty()) {
-                renderBanner(
-                    message = getString(
-                        R.string.scanner_status_danger,
-                        detectedAllergens.joinToString(", ")
-                    ),
-                    bannerStyle = BannerStyle.DANGER
+                val allergensStr = detectedAllergens.joinToString(", ")
+                renderDynamicHUD(
+                    icon = "\uD83D\uDEA8",
+                    title = getString(R.string.hud_danger_title),
+                    message = getString(R.string.hud_danger_message, allergensStr),
+                    style = HudStyle.DANGER
                 )
                 persistScanIfNeeded(
                     detectedText = recognizedText,
                     riskLevel = ScanRisk.DANGER
                 )
             } else {
-                renderBanner(
-                    message = getString(R.string.scanner_status_safe),
-                    bannerStyle = BannerStyle.SAFE
+                renderDynamicHUD(
+                    icon = "\uD83D\uDEE1\uFE0F",
+                    title = getString(R.string.hud_safe_title),
+                    message = getString(R.string.hud_safe_message),
+                    style = HudStyle.SAFE
                 )
                 persistScanIfNeeded(
                     detectedText = recognizedText,
@@ -288,16 +291,15 @@ class ScannerFragment : Fragment() {
         val currentBinding = _binding ?: return
         error.printStackTrace()
         currentBinding.root.post {
-            renderBanner(
-                message = getString(R.string.scanner_status_error),
-                bannerStyle = BannerStyle.WARNING
+            renderDynamicHUD(
+                icon = "\u26A0\uFE0F",
+                title = getString(R.string.scanner_status_error),
+                message = getString(R.string.hud_error_message),
+                style = HudStyle.WARNING
             )
         }
     }
 
-    /**
-     * Evita duplicados consecutivos y dispara vibraciÃ³n sÃ³lo ante un peligro nuevo.
-     */
     private fun persistScanIfNeeded(detectedText: String, riskLevel: String) {
         val normalizedText = detectedText.trim().lowercase(Locale.getDefault())
         if (normalizedText.isBlank()) return
@@ -332,29 +334,42 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun renderBanner(message: String, bannerStyle: BannerStyle) {
-        val currentBinding = _binding ?: return
-        currentBinding.textStatusBanner.text = message
+    private fun renderDynamicHUD(
+        icon: String,
+        title: String,
+        message: String,
+        style: HudStyle
+    ) {
+        val card = binding.hudStatusCard
+        val ctx = requireContext()
 
-        val backgroundColor = ContextCompat.getColor(
-            requireContext(),
-            when (bannerStyle) {
-                BannerStyle.DANGER -> R.color.risk_danger_container
-                BannerStyle.WARNING -> R.color.risk_warning_container
-                BannerStyle.SAFE -> R.color.risk_safe_container
-            }
-        )
-        val textColor = ContextCompat.getColor(
-            requireContext(),
-            when (bannerStyle) {
-                BannerStyle.DANGER -> R.color.risk_danger_on
-                BannerStyle.WARNING -> R.color.risk_warning_on
-                BannerStyle.SAFE -> R.color.risk_safe_on
-            }
-        )
+        val (bgColor, textColor) = when (style) {
+            HudStyle.DANGER -> R.color.risk_danger_container to R.color.risk_danger_on
+            HudStyle.WARNING -> R.color.risk_warning_container to R.color.risk_warning_on
+            HudStyle.SAFE -> R.color.risk_safe_container to R.color.risk_safe_on
+        }
 
-        currentBinding.statusBanner.setCardBackgroundColor(backgroundColor)
-        currentBinding.textStatusBanner.setTextColor(textColor)
+        val newBg = ContextCompat.getColor(ctx, bgColor)
+        val newText = ContextCompat.getColor(ctx, textColor)
+
+        val currentBg = (card.cardBackgroundColor.defaultColor ?: newBg).let {
+            card.cardBackgroundColor.defaultColor
+        }
+
+        ValueAnimator.ofObject(ArgbEvaluator(), currentBg, newBg).apply {
+            duration = 350
+            addUpdateListener { animator ->
+                card.setCardBackgroundColor(animator.animatedValue as Int)
+            }
+            start()
+        }
+
+        binding.textHudIcon.text = icon
+        binding.textHudIcon.setTextColor(newText)
+        binding.textHudTitle.text = title
+        binding.textHudTitle.setTextColor(newText)
+        binding.textHudMessage.text = message
+        binding.textHudMessage.setTextColor(newText)
     }
 
     private data class AllergenKeyword(
@@ -362,16 +377,12 @@ class ScannerFragment : Fragment() {
         val normalizedName: String
     )
 
-    private enum class BannerStyle {
+    private enum class HudStyle {
         SAFE,
         WARNING,
         DANGER
     }
 
-    /**
-     * Puente entre CameraX y ML Kit. El anÃ¡lisis de negocio queda centralizado
-     * para reutilizar exactamente la misma lÃ³gica con imÃ¡genes de galerÃ­a.
-     */
     private inner class LabelTextAnalyzer : ImageAnalysis.Analyzer {
 
         override fun analyze(imageProxy: ImageProxy) {
