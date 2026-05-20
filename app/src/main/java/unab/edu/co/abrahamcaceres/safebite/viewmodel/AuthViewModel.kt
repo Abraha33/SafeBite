@@ -13,6 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
+import unab.edu.co.abrahamcaceres.safebite.model.cloud.UserCloudModel
 import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
 import unab.edu.co.abrahamcaceres.safebite.utils.SessionManager
 
@@ -63,7 +64,14 @@ class AuthViewModel(
                 val uid = authResult.user?.uid
                     ?: throw IllegalStateException("AUTH_FAILED")
 
-                firestoreRepo.saveUserProfile(uid, name, email, city, allergens).fold(
+                val profile = UserCloudModel(
+                    uid = uid,
+                    name = name,
+                    email = email,
+                    city = city,
+                    allergens = allergens
+                )
+                firestoreRepo.saveUserProfile(profile).fold(
                     onSuccess = { _registerSuccess.postValue(true) },
                     onFailure = { _emailError.postValue(appContext.getString(R.string.error_unknown)) }
                 )

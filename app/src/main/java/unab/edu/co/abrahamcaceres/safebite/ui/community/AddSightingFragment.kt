@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentAddSightingBinding
+import unab.edu.co.abrahamcaceres.safebite.model.cloud.SightingCloudModel
 import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
 
 class AddSightingFragment : Fragment() {
@@ -91,26 +92,26 @@ class AddSightingFragment : Fragment() {
         val price = priceStr.toDoubleOrNull() ?: 0.0
 
         lifecycleScope.launch {
-            val result = firestoreRepo.uploadCommunitySighting(
+            val sighting = SightingCloudModel(
                 productName = productName,
                 storeName = storeName,
                 price = price,
-                tip = communityTip,
+                communityTip = communityTip,
                 allergenTag = allergenTag
             )
+            val result = firestoreRepo.uploadCommunitySighting(sighting)
             result.fold(
                 onSuccess = {
                     Toast.makeText(requireContext(), R.string.add_sighting_publish_ok, Toast.LENGTH_SHORT).show()
+                    clearFields()
+                    hideKeyboard()
+                    findNavController().popBackStack()
                 },
                 onFailure = { e ->
                     Toast.makeText(requireContext(), e.message ?: "Error", Toast.LENGTH_SHORT).show()
                 }
             )
         }
-
-        clearFields()
-        hideKeyboard()
-        findNavController().popBackStack()
     }
 
     private fun clearFields() {
