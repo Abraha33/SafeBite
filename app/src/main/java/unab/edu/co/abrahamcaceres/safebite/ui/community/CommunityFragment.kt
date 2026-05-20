@@ -81,13 +81,12 @@ class CommunityFragment : Fragment() {
         binding.fabPublishTip.setOnClickListener {
             viewModel.publishSighting(
                 Sighting.crear(
-                    creatorName = "Tú",
-                    timeAgo = "just now",
-                    title = "Nuevo hallazgo sin gluten",
-                    allergenStatusText = "✓ 100% Seguro para tu Perfil",
-                    allergenRiskLevel = "SAFE",
-                    description = "Comparte tu experiencia con la comunidad...",
-                    locationName = "Tienda local v. ${binding.textSelectedCity.text}"
+                    productName = "Nuevo producto",
+                    storeName = "Tienda local",
+                    price = "Consultar precio",
+                    communityTip = "Comparte tu experiencia con la comunidad...",
+                    city = binding.textSelectedCity.text.toString(),
+                    allergenTag = "✓ 100% Seguro"
                 )
             )
         }

@@ -9,50 +9,55 @@ class Sighting(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
     private var id: Long = 0L,
-    @ColumnInfo(name = "creator_name")
-    private var creatorName: String = "",
-    @ColumnInfo(name = "time_ago")
-    private var timeAgo: String = "",
-    @ColumnInfo(name = "title")
-    private var title: String = "",
-    @ColumnInfo(name = "allergen_status_text")
-    private var allergenStatusText: String = "",
-    @ColumnInfo(name = "allergen_risk_level")
-    private var allergenRiskLevel: String = ScanRisk.SAFE,
-    @ColumnInfo(name = "description")
-    private var description: String = "",
-    @ColumnInfo(name = "location_name")
-    private var locationName: String = ""
+    @ColumnInfo(name = "product_name")
+    private var productName: String = "",
+    @ColumnInfo(name = "store_name")
+    private var storeName: String = "",
+    @ColumnInfo(name = "price")
+    private var price: String = "",
+    @ColumnInfo(name = "community_tip")
+    private var communityTip: String = "",
+    @ColumnInfo(name = "city")
+    private var city: String = "",
+    @ColumnInfo(name = "allergen_tag")
+    private var allergenTag: String = "",
+    @ColumnInfo(name = "latitude")
+    private var latitude: Double = 0.0,
+    @ColumnInfo(name = "longitude")
+    private var longitude: Double = 0.0
 ) {
 
     fun getId(): Long = id
-    fun getCreatorName(): String = creatorName
-    fun getTimeAgo(): String = timeAgo
-    fun getTitle(): String = title
-    fun getAllergenStatusText(): String = allergenStatusText
-    fun getAllergenRiskLevel(): String = allergenRiskLevel
-    fun getDescription(): String = description
-    fun getLocationName(): String = locationName
+    fun getProductName(): String = productName
+    fun getStoreName(): String = storeName
+    fun getPrice(): String = price
+    fun getCommunityTip(): String = communityTip
+    fun getCity(): String = city
+    fun getAllergenTag(): String = allergenTag
+    fun getLatitude(): Double = latitude
+    fun getLongitude(): Double = longitude
 
     companion object {
         fun crear(
-            creatorName: String,
-            timeAgo: String,
-            title: String,
-            allergenStatusText: String,
-            allergenRiskLevel: String,
-            description: String,
-            locationName: String
+            productName: String,
+            storeName: String,
+            price: String,
+            communityTip: String,
+            city: String,
+            allergenTag: String,
+            latitude: Double = 0.0,
+            longitude: Double = 0.0
         ): Sighting {
             return Sighting(
                 id = 0L,
-                creatorName = creatorName.trim(),
-                timeAgo = timeAgo.trim(),
-                title = title.trim(),
-                allergenStatusText = allergenStatusText.trim(),
-                allergenRiskLevel = allergenRiskLevel,
-                description = description.trim(),
-                locationName = locationName.trim()
+                productName = productName.trim(),
+                storeName = storeName.trim(),
+                price = price.trim(),
+                communityTip = communityTip.trim(),
+                city = city.trim(),
+                allergenTag = allergenTag.trim(),
+                latitude = latitude,
+                longitude = longitude
             )
         }
     }

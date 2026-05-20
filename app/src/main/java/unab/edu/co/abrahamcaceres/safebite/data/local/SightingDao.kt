@@ -13,7 +13,7 @@ interface SightingDao {
     @Query("SELECT * FROM sightings ORDER BY id DESC")
     fun observeAll(): LiveData<List<Sighting>>
 
-    @Query("SELECT * FROM sightings WHERE location_name LIKE '%' || :city || '%' ORDER BY id DESC")
+    @Query("SELECT * FROM sightings WHERE city LIKE '%' || :city || '%' ORDER BY id DESC")
     fun observeByCity(city: String): LiveData<List<Sighting>>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)

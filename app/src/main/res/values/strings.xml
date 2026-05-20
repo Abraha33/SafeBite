@@ -53,11 +53,11 @@
     <!-- Scanner HUD dinámico -->
     <string name="hud_waiting_title">SISTEMA DE ESCANEO ACTIVO</string>
     <string name="hud_waiting_message">Analizando texto de la etiqueta… Apunta directamente a la tabla de ingredientes del empaque.</string>
-    <string name="hud_safe_title">PRODUCTO VERIFICADO SEGURO</string>
-    <string name="hud_safe_message">0 coincidencias de alérgenos detectadas. Este artículo es seguro según tus preferencias dietéticas.</string>
-    <string name="hud_danger_title">ALÉRGENO CRÍTICO DETECTADO</string>
-    <string name="hud_danger_message">¡ALERTA! El procesador de IA identificó %1$s en los ingredientes. No se recomienda consumir este producto.</string>
-    <string name="hud_error_message">No pudimos analizar la imagen. Intenta enfocar mejor la etiqueta o usa la galería.</string>
+    <string name="hud_safe_title">PRODUCT VERIFIED SAFE</string>
+    <string name="hud_safe_message">0 allergen matches detected. This product is safe for your dietary profile.</string>
+    <string name="hud_danger_title">CRITICAL ALERT: Allergen Detected</string>
+    <string name="hud_danger_message">The AI processor identified %1$s in the ingredients. Consumption is not recommended.</string>
+    <string name="hud_error_message">Could not analyze the image. Try focusing the label better or use the gallery.</string>
 
     <!-- Alérgenos -->
     <string name="allergens_title">Mi lista negra</string>

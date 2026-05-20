@@ -70,11 +70,9 @@ class ScannerFragment : Fragment() {
             if (granted) {
                 startCameraFlow()
             } else {
-                renderDynamicHUD(
-                    icon = "\uD83D\uDEAB",
+                showWarningHUD(
                     title = getString(R.string.scanner_status_permission_denied),
-                    message = getString(R.string.scanner_status_permission_body),
-                    style = HudStyle.WARNING
+                    message = getString(R.string.scanner_status_permission_body)
                 )
             }
         }
@@ -101,12 +99,7 @@ class ScannerFragment : Fragment() {
         configurePreview()
         observeAllergens()
         setupActions()
-        renderDynamicHUD(
-            icon = "\uD83D\uDEE1\uFE0F",
-            title = getString(R.string.hud_waiting_title),
-            message = getString(R.string.hud_waiting_message),
-            style = HudStyle.SAFE
-        )
+        renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
         ensureCameraPermissionAndStart()
     }
 
@@ -145,11 +138,9 @@ class ScannerFragment : Fragment() {
         val text = latestRecognizedText
         if (text.isNullOrBlank()) {
             vibrateDangerFeedback()
-            renderDynamicHUD(
-                icon = "\u26A0\uFE0F",
+            showWarningHUD(
                 title = getString(R.string.scanner_status_waiting),
-                message = getString(R.string.hud_error_message),
-                style = HudStyle.WARNING
+                message = getString(R.string.hud_error_message)
             )
             return
         }
@@ -202,11 +193,9 @@ class ScannerFragment : Fragment() {
             startCameraFlow()
             return
         }
-        renderDynamicHUD(
-            icon = "\uD83D\uDCF7",
+        showWarningHUD(
             title = getString(R.string.scanner_status_permission_required),
-            message = getString(R.string.scanner_status_permission_body),
-            style = HudStyle.WARNING
+            message = getString(R.string.scanner_status_permission_body)
         )
         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
@@ -290,12 +279,7 @@ class ScannerFragment : Fragment() {
 
         if (normalizedText.isBlank()) {
             currentBinding.root.post {
-                renderDynamicHUD(
-                    icon = "\uD83D\uDEE1\uFE0F",
-                    title = getString(R.string.hud_waiting_title),
-                    message = getString(R.string.hud_waiting_message),
-                    style = HudStyle.SAFE
-                )
+                renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
             }
             return
         }
@@ -309,24 +293,14 @@ class ScannerFragment : Fragment() {
             if (detectedAllergens.isNotEmpty()) {
                 val allergensStr = detectedAllergens.joinToString(", ")
                 showDetectedChip(allergensStr)
-                renderDynamicHUD(
-                    icon = "\uD83D\uDEA8",
-                    title = getString(R.string.hud_danger_title),
-                    message = getString(R.string.hud_danger_message, allergensStr),
-                    style = HudStyle.DANGER
-                )
+                renderDynamicHUD(riskLevel = ScanRisk.DANGER, matchedAllergen = allergensStr)
                 persistScanIfNeeded(
                     detectedText = recognizedText,
                     riskLevel = ScanRisk.DANGER
                 )
             } else {
                 hideDetectedChip()
-                renderDynamicHUD(
-                    icon = "\uD83D\uDEE1\uFE0F",
-                    title = getString(R.string.hud_safe_title),
-                    message = getString(R.string.hud_safe_message),
-                    style = HudStyle.SAFE
-                )
+                renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
                 persistScanIfNeeded(
                     detectedText = recognizedText,
                     riskLevel = ScanRisk.SAFE
@@ -350,11 +324,9 @@ class ScannerFragment : Fragment() {
         val currentBinding = _binding ?: return
         error.printStackTrace()
         currentBinding.root.post {
-            renderDynamicHUD(
-                icon = "\u26A0\uFE0F",
+            showWarningHUD(
                 title = getString(R.string.scanner_status_error),
-                message = getString(R.string.hud_error_message),
-                style = HudStyle.WARNING
+                message = getString(R.string.hud_error_message)
             )
         }
     }
@@ -393,20 +365,13 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun renderDynamicHUD(
-        icon: String,
-        title: String,
-        message: String,
-        style: HudStyle
-    ) {
+    private fun renderDynamicHUD(riskLevel: String, matchedAllergen: String?) {
         val card = binding.hudStatusCard
         val ctx = requireContext()
 
-        val (bgColor, textColor) = when (style) {
-            HudStyle.DANGER -> R.color.risk_danger_container to R.color.risk_danger_on
-            HudStyle.WARNING -> R.color.risk_warning_container to R.color.risk_warning_on
-            HudStyle.SAFE -> R.color.risk_safe_container to R.color.risk_safe_on
-        }
+        val isDanger = riskLevel == ScanRisk.DANGER
+        val bgColor = if (isDanger) R.color.risk_danger_container else R.color.risk_safe_container
+        val textColor = if (isDanger) R.color.risk_danger_on else R.color.risk_safe_on
 
         val newBg = ContextCompat.getColor(ctx, bgColor)
         val newText = ContextCompat.getColor(ctx, textColor)
@@ -419,8 +384,35 @@ class ScannerFragment : Fragment() {
             start()
         }
 
-        binding.textHudIcon.text = icon
-        binding.textHudIcon.setTextColor(newText)
+        binding.textHudTitle.text = if (isDanger) {
+            getString(R.string.hud_danger_title)
+        } else {
+            getString(R.string.hud_safe_title)
+        }
+        binding.textHudTitle.setTextColor(newText)
+
+        binding.textHudMessage.text = if (isDanger && matchedAllergen != null) {
+            getString(R.string.hud_danger_message, matchedAllergen)
+        } else {
+            getString(R.string.hud_safe_message)
+        }
+        binding.textHudMessage.setTextColor(newText)
+    }
+
+    private fun showWarningHUD(title: String, message: String) {
+        val card = binding.hudStatusCard
+        val ctx = requireContext()
+        val newBg = ContextCompat.getColor(ctx, R.color.risk_warning_container)
+        val newText = ContextCompat.getColor(ctx, R.color.risk_warning_on)
+
+        ValueAnimator.ofObject(ArgbEvaluator(), card.cardBackgroundColor.defaultColor, newBg).apply {
+            duration = 350
+            addUpdateListener { animator ->
+                card.setCardBackgroundColor(animator.animatedValue as Int)
+            }
+            start()
+        }
+
         binding.textHudTitle.text = title
         binding.textHudTitle.setTextColor(newText)
         binding.textHudMessage.text = message
@@ -431,12 +423,6 @@ class ScannerFragment : Fragment() {
         val displayName: String,
         val normalizedName: String
     )
-
-    private enum class HudStyle {
-        SAFE,
-        WARNING,
-        DANGER
-    }
 
     private inner class LabelTextAnalyzer : ImageAnalysis.Analyzer {
 
