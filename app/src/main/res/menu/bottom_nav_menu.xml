@@ -16,4 +16,8 @@
         android:id="@+id/allergensFragment"
         android:icon="@android:drawable/ic_menu_sort_by_size"
         android:title="@string/allergens_title" />
+    <item
+        android:id="@+id/profileFragment"
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="@string/profile_title" />
 </menu>

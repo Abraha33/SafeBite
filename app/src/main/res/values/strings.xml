@@ -50,9 +50,21 @@
     <string name="scanner_status_error">Error de análisis</string>
     <string name="scanner_preview_cd">Vista previa de la cámara para analizar etiquetas</string>
 
+    <!-- Galería -->
+    <string name="gallery_analyzing_title">ANALIZANDO IMAGEN</string>
+    <string name="gallery_analyzing_message">Analizando imagen de la galería…</string>
+    <string name="gallery_no_info_title">SIN INFORMACIÓN NUTRICIONAL</string>
+    <string name="gallery_no_info_message">No se detectó información nutricional válida en la imagen seleccionada.</string>
+    <string name="gallery_safe_message">0 coincidencias con tu perfil. Producto verificado seguro.</string>
+    <string name="gallery_danger_message">Se identificó %1$s en los ingredientes. No se recomienda su consumo.</string>
+
     <!-- Scanner HUD dinámico -->
     <string name="hud_waiting_title">SISTEMA DE ESCANEO ACTIVO</string>
     <string name="hud_waiting_message">Analizando texto de la etiqueta… Apunta directamente a la tabla de ingredientes del empaque.</string>
+    <string name="hud_neutral_title">Buscando etiqueta…</string>
+    <string name="hud_neutral_message">Apunte la cámara a la tabla de ingredientes del empaque.</string>
+    <string name="tracking_label_found">Leyendo etiqueta…</string>
+
     <string name="hud_safe_title">PRODUCTO VERIFICADO - SEGURO</string>
     <string name="hud_safe_message">0 coincidencias con tu perfil. Este producto es seguro.</string>
     <string name="hud_danger_title">ALERTA - CONTIENE ALÉRGENOS</string>

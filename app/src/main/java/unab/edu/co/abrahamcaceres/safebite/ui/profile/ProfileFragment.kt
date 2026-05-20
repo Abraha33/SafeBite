@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -34,40 +35,48 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
+            val statusBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).top
+            val navBars = insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars()).bottom
+            v.setPadding(0, statusBars, 0, navBars)
+            insets
+        }
+
         setupObservers()
         setupLogout()
         viewModel.loadCurrentUser()
     }
 
     private fun setupObservers() {
-        viewModel.currentUser.observe(viewLifecycleOwner) { user ->
-            binding.textProfileName.text = user?.getFullName().orEmpty()
-            binding.textProfileEmail.text = user?.getEmail().orEmpty()
-        }
-
-        viewModel.allergens.observe(viewLifecycleOwner) { allergens ->
-            binding.chipGroupProfileAllergens.removeAllViews()
-            if (allergens.isNullOrEmpty()) {
-                binding.textAllergensEmpty.visibility = View.VISIBLE
-            } else {
-                binding.textAllergensEmpty.visibility = View.GONE
-                allergens.forEach { allergen ->
-                    val chip = Chip(requireContext()).apply {
-                        text = allergen.getDisplayName()
-                        isClickable = false
-                        isFocusable = false
-                        setChipBackgroundColorResource(R.color.risk_safe_container)
-                        setTextColor(resources.getColor(R.color.risk_safe_on, null))
-                    }
-                    binding.chipGroupProfileAllergens.addView(chip)
-                }
-            }
+        viewModel.profileState.observe(viewLifecycleOwner) { state ->
+            binding.textProfileName.text = state.name
+            binding.textProfileEmail.text = state.email
+            renderAllergenChips(state.allergens)
         }
 
         viewModel.shouldReturnToLogin.observe(viewLifecycleOwner) { shouldNavigate ->
             if (shouldNavigate) {
                 viewModel.consumeReturnToLogin()
                 findNavController().navigate(R.id.action_global_login)
+            }
+        }
+    }
+
+    private fun renderAllergenChips(allergens: List<String>) {
+        binding.chipGroupProfileAllergens.removeAllViews()
+        if (allergens.isEmpty()) {
+            binding.textAllergensEmpty.visibility = View.VISIBLE
+        } else {
+            binding.textAllergensEmpty.visibility = View.GONE
+            allergens.forEach { allergen ->
+                val chip = Chip(requireContext()).apply {
+                    text = allergen
+                    isClickable = false
+                    isFocusable = false
+                    setChipBackgroundColorResource(R.color.risk_safe_container)
+                    setTextColor(resources.getColor(R.color.risk_safe_on, null))
+                }
+                binding.chipGroupProfileAllergens.addView(chip)
             }
         }
     }

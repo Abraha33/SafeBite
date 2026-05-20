@@ -1,10 +1,13 @@
 package unab.edu.co.abrahamcaceres.safebite.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
@@ -37,7 +40,9 @@ class CommunityViewModel(
     private var snapshotRegistration: ListenerRegistration? = null
 
     init {
-        listenToSightings("")
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            listenToSightings("")
+        }
     }
 
     override fun onCleared() {
@@ -48,7 +53,9 @@ class CommunityViewModel(
     fun filterByCity(city: String) {
         _selectedCity.value = city
         snapshotRegistration?.remove()
-        listenToSightings(city)
+        if (FirebaseAuth.getInstance().currentUser != null) {
+            listenToSightings(city)
+        }
     }
 
     fun publishSighting(sighting: SightingCloudModel) {
@@ -71,24 +78,34 @@ class CommunityViewModel(
         _isLoading.value = true
         snapshotRegistration = firestoreRepo.listenToSightings(city) { cloudList, error ->
             if (error != null) {
+                Log.w(TAG, "Firestore snapshot error: ${error.message}")
                 _sightings.value = emptyList()
-            } else {
+                _isLoading.value = false
+                return@listenToSightings
+            }
+            try {
                 _sightings.value = cloudList?.map { it.toSighting() } ?: emptyList()
+            } catch (e: Exception) {
+                Log.e(TAG, "Error mapping sightings: ${e.message}")
+                _sightings.value = emptyList()
             }
             _isLoading.value = false
         }
     }
 
     private companion object {
+        const val TAG = "CommunityVM"
+
         fun SightingCloudModel.toSighting(): Sighting {
             val fmt = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
             fmt.maximumFractionDigits = 0
+            val millis = createdAt?.toDate()?.time ?: System.currentTimeMillis()
             return Sighting.crear(
                 creatorName = creatorName.ifBlank { "Anónimo" },
-                timeAgo = formatRelativeTime(createdAt),
-                productName = productName,
-                storeName = storeName,
-                price = fmt.format(price),
+                timeAgo = formatRelativeTime(millis),
+                productName = productName.ifBlank { "Producto" },
+                storeName = storeName.ifBlank { "Tienda" },
+                price = if (price > 0) fmt.format(price) else "$0",
                 communityTip = communityTip,
                 targetCity = targetCity,
                 allergenTag = allergenTag,

@@ -45,21 +45,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBottomNav() {
-        val navOptions = NavOptions.Builder()
-            .setEnterAnim(R.anim.nav_enter)
-            .setExitAnim(R.anim.nav_exit)
-            .setPopEnterAnim(R.anim.fade_in)
-            .setPopExitAnim(R.anim.fade_out)
-            .setLaunchSingleTop(true)
-            .build()
-
         binding.bottomNav.setOnItemSelectedListener { item ->
-            if (FirebaseAuth.getInstance().currentUser != null) {
-                navController.navigate(item.itemId, null, navOptions)
-            } else {
-                navController.navigate(R.id.action_global_login, null, navOptions)
+            when (item.itemId) {
+                R.id.profileFragment -> {
+                    if (FirebaseAuth.getInstance().currentUser != null) {
+                        navController.navigate(R.id.profileFragment)
+                    } else {
+                        navController.navigate(R.id.loginFragment)
+                    }
+                    true
+                }
+                R.id.communityFragment -> { navController.navigate(R.id.communityFragment); true }
+                R.id.scannerFragment -> { navController.navigate(R.id.scannerFragment); true }
+                R.id.scanHistoryFragment -> { navController.navigate(R.id.scanHistoryFragment); true }
+                R.id.allergensFragment -> { navController.navigate(R.id.allergensFragment); true }
+                else -> false
             }
-            true
         }
     }
 

@@ -1,5 +1,8 @@
 package unab.edu.co.abrahamcaceres.safebite.model.cloud
 
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ServerTimestamp
+
 data class SightingCloudModel(
     var sightingId: String = "",
     var creatorUid: String = "",
@@ -12,5 +15,5 @@ data class SightingCloudModel(
     var targetCity: String = "",
     var latitude: Double = 0.0,
     var longitude: Double = 0.0,
-    var createdAt: Long = System.currentTimeMillis()
+    @ServerTimestamp var createdAt: Timestamp? = null
 )

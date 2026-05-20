@@ -1,5 +1,7 @@
 package unab.edu.co.abrahamcaceres.safebite.data.repository
 
+import android.util.Log
+import com.google.firebase.Timestamp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -31,6 +33,21 @@ class FirebaseFirestoreRepository {
                 Result.failure(IllegalStateException(e.message ?: ERROR_FIRESTORE))
             } catch (e: Exception) {
                 Result.failure(IllegalStateException(e.message ?: ERROR_UNKNOWN))
+            }
+        }
+
+    suspend fun fetchUserProfile(uid: String): Result<UserCloudModel> =
+        withContext(Dispatchers.IO) {
+            try {
+                val snapshot = firestore.collection(COLLECTION_USERS)
+                    .document(uid)
+                    .get()
+                    .await()
+                val user = snapshot.toObject(UserCloudModel::class.java)
+                    ?: return@withContext Result.failure(IllegalStateException("USER_NOT_FOUND"))
+                Result.success(user)
+            } catch (e: Exception) {
+                Result.failure(IllegalStateException(e.message ?: "UNKNOWN_ERROR"))
             }
         }
 
@@ -66,7 +83,31 @@ class FirebaseFirestoreRepository {
                 return@addSnapshotListener
             }
             val list = snapshot?.documents?.mapNotNull { doc ->
-                doc.toObject(SightingCloudModel::class.java)?.copy(sightingId = doc.id)
+                try {
+                    doc.toObject(SightingCloudModel::class.java)?.copy(sightingId = doc.id)
+                } catch (e: Exception) {
+                    Log.w(TAG, "Malformed sighting doc ${doc.id}, recovering: ${e.message}")
+                    try {
+                        val data = doc.data ?: return@mapNotNull null
+                        SightingCloudModel(
+                            sightingId = doc.id,
+                            creatorUid = (data["creatorUid"] as? String) ?: "",
+                            creatorName = (data["creatorName"] as? String) ?: "",
+                            productName = (data["productName"] as? String) ?: "",
+                            storeName = (data["storeName"] as? String) ?: "",
+                            price = (data["price"] as? Double) ?: 0.0,
+                            communityTip = (data["communityTip"] as? String) ?: "",
+                            allergenTag = (data["allergenTag"] as? String) ?: "",
+                            targetCity = (data["targetCity"] as? String) ?: "",
+                            latitude = (data["latitude"] as? Double) ?: 0.0,
+                            longitude = (data["longitude"] as? Double) ?: 0.0,
+                            createdAt = Timestamp.now()
+                        )
+                    } catch (e2: Exception) {
+                        Log.e(TAG, "Could not recover sighting doc ${doc.id}: ${e2.message}")
+                        null
+                    }
+                }
             } ?: emptyList()
             onEvent(list, null)
         }
@@ -94,6 +135,7 @@ class FirebaseFirestoreRepository {
         }
 
     companion object {
+        const val TAG = "FirestoreRepo"
         const val COLLECTION_USERS = "users"
         const val COLLECTION_SIGHTINGS = "sightings"
         const val SUBCOLLECTION_SCANS = "scan_history"

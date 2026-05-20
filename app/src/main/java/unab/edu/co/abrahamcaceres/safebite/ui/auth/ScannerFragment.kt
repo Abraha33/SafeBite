@@ -3,6 +3,7 @@ package unab.edu.co.abrahamcaceres.safebite.ui.auth
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.net.Uri
@@ -33,7 +34,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -77,6 +80,22 @@ class ScannerFragment : Fragment() {
     private var lastPersistedFingerprint: String? = null
     private var latestRecognizedText: String? = null
 
+    private var stableFrameCount = 0
+    private var lastFrameFingerprint: String? = null
+    private var autoTriggered = false
+
+    companion object {
+        private const val MIN_STABLE_FRAMES = 5
+    }
+
+    private val labelStructuralKeywords = setOf(
+        "ingredientes", "contiene", "composición", "composicion",
+        "tabla", "valores", "nutricional", "nutrition", "ingredients",
+        "elaborado", "fabricado", "puede contener", "trazas",
+        "conservar", "almacenar", "peso", "neto", "lote",
+        "fecha", "vencimiento", "consumir"
+    )
+
     private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
             if (!isAdded) return@registerForActivityResult
@@ -112,7 +131,7 @@ class ScannerFragment : Fragment() {
         configurePreview()
         observeAllergens()
         setupActions()
-        renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
+        renderNeutralHUD()
         ensureCameraPermissionAndStart()
     }
 
@@ -140,7 +159,7 @@ class ScannerFragment : Fragment() {
         }
 
         binding.buttonCapture.setOnClickListener {
-            captureCurrentScan()
+            triggerManualScan()
         }
 
         binding.buttonProfile.setOnClickListener {
@@ -148,7 +167,7 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun captureCurrentScan() {
+    private fun triggerManualScan() {
         val text = latestRecognizedText
         if (text.isNullOrBlank()) {
             vibrateDangerFeedback()
@@ -158,13 +177,24 @@ class ScannerFragment : Fragment() {
             )
             return
         }
+        autoTriggered = true
+        freezeCamera()
+        finalizeScan(text)
+    }
 
+    private fun autoTriggerScan(text: String) {
+        if (autoTriggered || scanFrozen) return
+        autoTriggered = true
+        freezeCamera()
+        finalizeScan(text)
+    }
+
+    private fun finalizeScan(text: String) {
         ToneGenerator(AudioManager.STREAM_MUSIC, 100).apply {
             startTone(ToneGenerator.TONE_PROP_BEEP, 150)
             release()
         }
 
-        freezeCamera()
         val riskLevel = evaluateRiskLevel(text)
 
         val scan = ProductScan.crear(
@@ -285,40 +315,129 @@ class ScannerFragment : Fragment() {
     }
 
     private fun analyzeGalleryImage(imageUri: Uri) {
-        runCatching {
-            InputImage.fromFilePath(requireContext(), imageUri)
-        }.onSuccess { image ->
-            processImage(image)
-        }.onFailure { throwable ->
-            handleAnalysisError(throwable as? Exception ?: RuntimeException(throwable))
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                withContext(Dispatchers.Main) {
+                    renderNeutralHUD(
+                        title = getString(R.string.gallery_analyzing_title),
+                        message = getString(R.string.gallery_analyzing_message)
+                    )
+                }
+
+                val bitmap = BitmapFactory.decodeStream(
+                    requireContext().contentResolver.openInputStream(imageUri)
+                ) ?: throw IllegalStateException("Bitmap null")
+
+                val image = InputImage.fromBitmap(bitmap, 0)
+
+                textRecognizer.process(image)
+                    .addOnSuccessListener { visionText ->
+                        analyzeGalleryText(visionText.text)
+                    }
+                    .addOnFailureListener { throwable ->
+                        handleAnalysisError(throwable as? Exception ?: RuntimeException(throwable))
+                    }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    handleAnalysisError(e)
+                }
+            }
         }
     }
 
-    private fun processImage(image: InputImage) {
-        textRecognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                analyzeText(visionText.text)
+    private fun analyzeGalleryText(recognizedText: String) {
+        val currentBinding = _binding ?: return
+        latestRecognizedText = recognizedText
+
+        val cleaned = sanitizeText(recognizedText)
+        if (cleaned.isBlank() || !hasNutritionalContent(cleaned)) {
+            currentBinding.root.post {
+                renderNeutralHUD(
+                    title = getString(R.string.gallery_no_info_title),
+                    message = getString(R.string.gallery_no_info_message)
+                )
             }
-            .addOnFailureListener { throwable ->
-                handleAnalysisError(Exception(throwable))
+            return
+        }
+
+        analyzeIngredientsFromGallery(cleaned)
+    }
+
+    private fun hasNutritionalContent(cleaned: String): Boolean {
+        if (cleaned.length < 10) return false
+        val galleryNutritionalKeywords = setOf(
+            "ingredientes", "contiene", "composición", "composicion",
+            "tabla", "información", "informacion", "valores",
+            "nutricional", "ingredients", "nutrition", "nutritional",
+            "elaborado", "fabricado", "puede contener", "trazas"
+        )
+        return galleryNutritionalKeywords.any { cleaned.contains(it) }
+    }
+
+    private fun analyzeIngredientsFromGallery(cleaned: String) {
+        val riskLevel = evaluateRiskLevel(cleaned)
+        val detectedAllergens = findMatchedAllergens(cleaned)
+
+        _binding?.root?.post {
+            when (riskLevel) {
+                ScanRisk.DANGER -> {
+                    val allergensStr = detectedAllergens.joinToString(", ")
+                    showDetectedChip(allergensStr)
+                    renderDynamicHUD(riskLevel = riskLevel, matchedAllergen = allergensStr)
+                    vibrateDangerFeedback()
+                }
+                ScanRisk.WARNING -> {
+                    renderDynamicHUD(
+                        riskLevel = riskLevel,
+                        matchedAllergen = detectedAllergens.firstOrNull()
+                    )
+                }
+                else -> {
+                    renderDynamicHUD(
+                        title = getString(R.string.hud_safe_title),
+                        message = getString(R.string.gallery_safe_message),
+                        riskLevel = riskLevel,
+                        matchedAllergen = null
+                    )
+                    ToneGenerator(AudioManager.STREAM_MUSIC, 100).apply {
+                        startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+                        release()
+                    }
+                }
             }
+        }
     }
 
     private fun analyzeText(recognizedText: String) {
         val currentBinding = _binding ?: return
         latestRecognizedText = recognizedText
 
-        if (recognizedText.isBlank()) {
+        val cleaned = sanitizeText(recognizedText)
+
+        if (cleaned.isBlank() || !isValidLabelText(cleaned)) {
             currentBinding.root.post {
-                renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
+                hideDetectedChip()
+                hideTrackingIndicator()
+                renderNeutralHUD()
             }
+            resetStableCounter()
             return
         }
 
-        val riskLevel = evaluateRiskLevel(recognizedText)
-        val detectedAllergens = findMatchedAllergens(recognizedText)
+        val riskLevel = evaluateRiskLevel(cleaned)
+        val detectedAllergens = findMatchedAllergens(cleaned)
+
+        val fingerprint = "$riskLevel|$cleaned"
+        if (fingerprint == lastFrameFingerprint) {
+            stableFrameCount++
+        } else {
+            stableFrameCount = 1
+            lastFrameFingerprint = fingerprint
+        }
 
         currentBinding.root.post {
+            showTrackingIndicator()
+
             if (riskLevel != ScanRisk.SAFE) {
                 val allergensStr = detectedAllergens.joinToString(", ")
                 showDetectedChip(allergensStr)
@@ -328,6 +447,17 @@ class ScannerFragment : Fragment() {
                 renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
             }
         }
+
+        if (stableFrameCount >= MIN_STABLE_FRAMES && !autoTriggered && !scanFrozen) {
+            currentBinding.root.post {
+                autoTriggerScan(recognizedText)
+            }
+        }
+    }
+
+    private fun isValidLabelText(cleaned: String): Boolean {
+        if (cleaned.length < 10) return false
+        return labelStructuralKeywords.any { cleaned.contains(it) }
     }
 
     private fun sanitizeText(text: String): String {
@@ -336,8 +466,7 @@ class ScannerFragment : Fragment() {
             .trim()
     }
 
-    private fun evaluateRiskLevel(text: String): String {
-        val cleaned = sanitizeText(text)
+    private fun evaluateRiskLevel(cleaned: String): String {
         if (cleaned.isBlank()) return ScanRisk.SAFE
 
         var hasExact = false
@@ -361,8 +490,7 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun findMatchedAllergens(text: String): List<String> {
-        val cleaned = sanitizeText(text)
+    private fun findMatchedAllergens(cleaned: String): List<String> {
         if (cleaned.isBlank()) return emptyList()
 
         val matched = mutableListOf<String>()
@@ -384,6 +512,24 @@ class ScannerFragment : Fragment() {
             }
         }
         return false
+    }
+
+    private fun showTrackingIndicator() {
+        binding.scanOverlay.visibility = View.VISIBLE
+        binding.textTrackingStatus.apply {
+            text = getString(R.string.tracking_label_found)
+            visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideTrackingIndicator() {
+        binding.scanOverlay.visibility = View.GONE
+        binding.textTrackingStatus.visibility = View.GONE
+    }
+
+    private fun resetStableCounter() {
+        stableFrameCount = 0
+        lastFrameFingerprint = null
     }
 
     private fun showDetectedChip(allergenText: String) {
@@ -411,7 +557,7 @@ class ScannerFragment : Fragment() {
     private fun uploadScanToFirestore(detectedText: String, riskLevel: String) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val matchedAllergens = if (riskLevel != ScanRisk.SAFE) {
-            findMatchedAllergens(detectedText)
+            findMatchedAllergens(sanitizeText(detectedText))
         } else {
             emptyList()
         }
@@ -441,7 +587,26 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun renderDynamicHUD(riskLevel: String, matchedAllergen: String?) {
+    private fun renderNeutralHUD(
+        title: String = getString(R.string.hud_neutral_title),
+        message: String = getString(R.string.hud_neutral_message)
+    ) {
+        val ctx = requireContext()
+        binding.hudStatusCard.setCardBackgroundColor(
+            ContextCompat.getColor(ctx, R.color.hud_neutral_bg)
+        )
+        binding.textHudTitle.setTextColor(ContextCompat.getColor(ctx, R.color.hud_neutral_text))
+        binding.textHudMessage.setTextColor(ContextCompat.getColor(ctx, R.color.hud_neutral_text))
+        binding.textHudTitle.text = title
+        binding.textHudMessage.text = message
+    }
+
+    private fun renderDynamicHUD(
+        riskLevel: String,
+        matchedAllergen: String?,
+        title: String? = null,
+        message: String? = null
+    ) {
         val card = binding.hudStatusCard
         val ctx = requireContext()
 
@@ -462,13 +627,13 @@ class ScannerFragment : Fragment() {
         binding.textHudTitle.setTextColor(ContextCompat.getColor(ctx, textRes))
         binding.textHudMessage.setTextColor(ContextCompat.getColor(ctx, textRes))
 
-        binding.textHudTitle.text = when {
+        binding.textHudTitle.text = title ?: when {
             isDanger -> getString(R.string.hud_danger_title)
             isWarning -> getString(R.string.hud_warning_title)
             else -> getString(R.string.hud_safe_title)
         }
 
-        binding.textHudMessage.text = when {
+        binding.textHudMessage.text = message ?: when {
             isDanger && matchedAllergen != null ->
                 getString(R.string.hud_danger_message, matchedAllergen)
             isWarning && matchedAllergen != null ->
@@ -478,10 +643,10 @@ class ScannerFragment : Fragment() {
     }
 
     private fun showWarningHUD(title: String, message: String) {
-        val card = binding.hudStatusCard
         val ctx = requireContext()
-
-        card.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.hud_warning_bg))
+        binding.hudStatusCard.setCardBackgroundColor(
+            ContextCompat.getColor(ctx, R.color.hud_warning_bg)
+        )
         binding.textHudTitle.setTextColor(ContextCompat.getColor(ctx, R.color.hud_warning_text))
         binding.textHudMessage.setTextColor(ContextCompat.getColor(ctx, R.color.hud_warning_text))
         binding.textHudTitle.text = title

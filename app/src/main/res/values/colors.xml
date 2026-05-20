@@ -24,6 +24,8 @@
     <color name="hud_warning_text">#FF000000</color>
     <color name="hud_danger_bg">#FFF44336</color>
     <color name="hud_danger_text">#FFFFFFFF</color>
+    <color name="hud_neutral_bg">#FF607D8B</color>
+    <color name="hud_neutral_text">#FFFFFFFF</color>
 
     <!-- Scanner bottom bar -->
     <color name="scanner_bar_background">#F2181818</color>
