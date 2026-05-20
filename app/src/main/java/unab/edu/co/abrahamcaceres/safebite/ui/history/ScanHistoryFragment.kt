@@ -8,6 +8,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.MenuProvider
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -51,6 +53,12 @@ class ScanHistoryFragment : Fragment() {
 
         binding.toolbarHistory.setupWithNavController(findNavController())
         binding.toolbarHistory.addMenuProvider(HistoryMenuProvider())
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, windowInsets ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(insets.left, insets.top, insets.right, insets.bottom)
+            windowInsets
+        }
 
         binding.rvScanHistory.layoutManager = LinearLayoutManager(requireContext())
         binding.rvScanHistory.adapter = adapter

@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.launch
 import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.model.Sighting
@@ -33,13 +34,21 @@ class CommunityViewModel(
     private val _publishResult = MutableLiveData<Boolean?>(null)
     val publishResult: LiveData<Boolean?> = _publishResult
 
+    private var snapshotRegistration: ListenerRegistration? = null
+
     init {
-        fetchSightings("")
+        listenToSightings("")
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        snapshotRegistration?.remove()
     }
 
     fun filterByCity(city: String) {
         _selectedCity.value = city
-        fetchSightings(city)
+        snapshotRegistration?.remove()
+        listenToSightings(city)
     }
 
     fun publishSighting(sighting: SightingCloudModel) {
@@ -58,16 +67,14 @@ class CommunityViewModel(
         _publishResult.value = null
     }
 
-    private fun fetchSightings(city: String) {
-        viewModelScope.launch {
-            _isLoading.value = true
-            val result = firestoreRepo.fetchSightings(city = city)
-            result.fold(
-                onSuccess = { cloudList ->
-                    _sightings.value = cloudList.map { it.toSighting() }
-                },
-                onFailure = { _sightings.value = emptyList() }
-            )
+    private fun listenToSightings(city: String) {
+        _isLoading.value = true
+        snapshotRegistration = firestoreRepo.listenToSightings(city) { cloudList, error ->
+            if (error != null) {
+                _sightings.value = emptyList()
+            } else {
+                _sightings.value = cloudList?.map { it.toSighting() } ?: emptyList()
+            }
             _isLoading.value = false
         }
     }

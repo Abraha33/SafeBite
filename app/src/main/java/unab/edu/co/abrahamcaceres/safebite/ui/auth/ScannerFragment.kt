@@ -1,10 +1,10 @@
 package unab.edu.co.abrahamcaceres.safebite.ui.auth
 
 import android.Manifest
-import android.animation.ArgbEvaluator
-import android.animation.ValueAnimator
 import android.content.Context
 import android.content.pm.PackageManager
+import android.media.AudioManager
+import android.media.ToneGenerator
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -69,6 +69,7 @@ class ScannerFragment : Fragment() {
     private var camera: Camera? = null
 
     private val firestoreRepo = FirebaseFirestoreRepository()
+    private var scanFrozen = false
 
     @Volatile
     private var allergenKeywords: List<AllergenKeyword> = emptyList()
@@ -157,21 +158,29 @@ class ScannerFragment : Fragment() {
             )
             return
         }
-        val riskLevel = evaluateRiskLevel(text)
-        val fingerprint = "$riskLevel|${text.trim().lowercase(Locale.getDefault())}"
-        if (fingerprint == lastPersistedFingerprint) return
 
-        lastPersistedFingerprint = fingerprint
-        if (riskLevel != ScanRisk.SAFE) {
-            vibrateDangerFeedback()
+        ToneGenerator(AudioManager.STREAM_MUSIC, 100).apply {
+            startTone(ToneGenerator.TONE_PROP_BEEP, 150)
+            release()
         }
 
-        scanHistoryViewModel.insertScan(
-            ProductScan.crear(
-                textoDetectado = text,
-                nivelRiesgo = riskLevel
-            )
+        freezeCamera()
+        val riskLevel = evaluateRiskLevel(text)
+
+        val scan = ProductScan.crear(
+            textoDetectado = text,
+            nivelRiesgo = riskLevel
         )
+        scanHistoryViewModel.insertScan(scan) { scanId ->
+            uploadScanToFirestore(text, riskLevel)
+            val bundle = Bundle().apply { putLong("scanId", scanId) }
+            findNavController().navigate(R.id.action_scanner_to_detail, bundle)
+        }
+    }
+
+    private fun freezeCamera() {
+        scanFrozen = true
+        imageAnalysis?.clearAnalyzer()
     }
 
     private fun configurePreview() {
@@ -314,17 +323,9 @@ class ScannerFragment : Fragment() {
                 val allergensStr = detectedAllergens.joinToString(", ")
                 showDetectedChip(allergensStr)
                 renderDynamicHUD(riskLevel = riskLevel, matchedAllergen = allergensStr)
-                persistScanIfNeeded(
-                    detectedText = recognizedText,
-                    riskLevel = riskLevel
-                )
             } else {
                 hideDetectedChip()
                 renderDynamicHUD(riskLevel = ScanRisk.SAFE, matchedAllergen = null)
-                persistScanIfNeeded(
-                    detectedText = recognizedText,
-                    riskLevel = ScanRisk.SAFE
-                )
             }
         }
     }
@@ -407,39 +408,13 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun persistScanIfNeeded(detectedText: String, riskLevel: String) {
-        val normalizedText = detectedText.trim().lowercase(Locale.getDefault())
-        if (normalizedText.isBlank()) return
-
-        val fingerprint = "$riskLevel|$normalizedText"
-        if (fingerprint == lastPersistedFingerprint) return
-
-        lastPersistedFingerprint = fingerprint
-        if (riskLevel != ScanRisk.SAFE) {
-            vibrateDangerFeedback()
-        }
-
-        val scan = ProductScan.crear(
-            textoDetectado = detectedText,
-            nivelRiesgo = riskLevel
-        )
-
-        scanHistoryViewModel.insertScan(scan)
-
+    private fun uploadScanToFirestore(detectedText: String, riskLevel: String) {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val matchedAllergens = if (riskLevel != ScanRisk.SAFE) {
             findMatchedAllergens(detectedText)
         } else {
             emptyList()
         }
-        uploadScanToFirestore(detectedText, riskLevel, matchedAllergens)
-    }
-
-    private fun uploadScanToFirestore(
-        detectedText: String,
-        riskLevel: String,
-        matchedAllergens: List<String>
-    ) {
-        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val scanModel = ScanHistoryModel(
             scanId = "",
             scanDate = System.currentTimeMillis(),
@@ -455,7 +430,6 @@ class ScannerFragment : Fragment() {
 
     private fun vibrateDangerFeedback() {
         val vibrationEffect = VibrationEffect.createOneShot(180L, VibrationEffect.DEFAULT_AMPLITUDE)
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager = requireContext().getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
             vibratorManager.defaultVibrator.vibrate(vibrationEffect)
@@ -473,34 +447,26 @@ class ScannerFragment : Fragment() {
 
         val isDanger = riskLevel == ScanRisk.DANGER
         val isWarning = riskLevel == ScanRisk.WARNING
-        val bgColor = when {
-            isDanger -> R.color.risk_danger_container
-            isWarning -> R.color.risk_warning_container
-            else -> R.color.risk_safe_container
+        val bgRes = when {
+            isDanger -> R.color.hud_danger_bg
+            isWarning -> R.color.hud_warning_bg
+            else -> R.color.hud_safe_bg
         }
-        val textColor = when {
-            isDanger -> R.color.risk_danger_on
-            isWarning -> R.color.risk_warning_on
-            else -> R.color.risk_safe_on
+        val textRes = when {
+            isDanger -> R.color.hud_danger_text
+            isWarning -> R.color.hud_warning_text
+            else -> R.color.hud_safe_text
         }
 
-        val newBg = ContextCompat.getColor(ctx, bgColor)
-        val newText = ContextCompat.getColor(ctx, textColor)
-
-        ValueAnimator.ofObject(ArgbEvaluator(), card.cardBackgroundColor.defaultColor, newBg).apply {
-            duration = 350
-            addUpdateListener { animator ->
-                card.setCardBackgroundColor(animator.animatedValue as Int)
-            }
-            start()
-        }
+        card.setCardBackgroundColor(ContextCompat.getColor(ctx, bgRes))
+        binding.textHudTitle.setTextColor(ContextCompat.getColor(ctx, textRes))
+        binding.textHudMessage.setTextColor(ContextCompat.getColor(ctx, textRes))
 
         binding.textHudTitle.text = when {
             isDanger -> getString(R.string.hud_danger_title)
             isWarning -> getString(R.string.hud_warning_title)
             else -> getString(R.string.hud_safe_title)
         }
-        binding.textHudTitle.setTextColor(newText)
 
         binding.textHudMessage.text = when {
             isDanger && matchedAllergen != null ->
@@ -509,27 +475,17 @@ class ScannerFragment : Fragment() {
                 getString(R.string.hud_warning_message, matchedAllergen)
             else -> getString(R.string.hud_safe_message)
         }
-        binding.textHudMessage.setTextColor(newText)
     }
 
     private fun showWarningHUD(title: String, message: String) {
         val card = binding.hudStatusCard
         val ctx = requireContext()
-        val newBg = ContextCompat.getColor(ctx, R.color.risk_warning_container)
-        val newText = ContextCompat.getColor(ctx, R.color.risk_warning_on)
 
-        ValueAnimator.ofObject(ArgbEvaluator(), card.cardBackgroundColor.defaultColor, newBg).apply {
-            duration = 350
-            addUpdateListener { animator ->
-                card.setCardBackgroundColor(animator.animatedValue as Int)
-            }
-            start()
-        }
-
+        card.setCardBackgroundColor(ContextCompat.getColor(ctx, R.color.hud_warning_bg))
+        binding.textHudTitle.setTextColor(ContextCompat.getColor(ctx, R.color.hud_warning_text))
+        binding.textHudMessage.setTextColor(ContextCompat.getColor(ctx, R.color.hud_warning_text))
         binding.textHudTitle.text = title
-        binding.textHudTitle.setTextColor(newText)
         binding.textHudMessage.text = message
-        binding.textHudMessage.setTextColor(newText)
     }
 
     private data class AllergenKeyword(
@@ -540,6 +496,11 @@ class ScannerFragment : Fragment() {
     private inner class LabelTextAnalyzer : ImageAnalysis.Analyzer {
 
         override fun analyze(imageProxy: ImageProxy) {
+            if (scanFrozen) {
+                imageProxy.close()
+                return
+            }
+
             val mediaImage = imageProxy.image
             if (mediaImage == null) {
                 imageProxy.close()

@@ -3,6 +3,8 @@ package unab.edu.co.abrahamcaceres.safebite.data.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
@@ -49,25 +51,26 @@ class FirebaseFirestoreRepository {
             }
         }
 
-    suspend fun fetchSightings(city: String = ""): Result<List<SightingCloudModel>> =
-        withContext(Dispatchers.IO) {
-            try {
-                var query = firestore.collection(COLLECTION_SIGHTINGS)
-                    .orderBy(FIELD_CREATED_AT, com.google.firebase.firestore.Query.Direction.DESCENDING)
-                if (city.isNotBlank()) {
-                    query = query.whereEqualTo(FIELD_TARGET_CITY, city)
-                }
-                val snapshot = query.get().await()
-                val sightings = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(SightingCloudModel::class.java)?.copy(sightingId = doc.id)
-                }
-                Result.success(sightings)
-            } catch (e: FirebaseFirestoreException) {
-                Result.failure(IllegalStateException(e.message ?: ERROR_FIRESTORE))
-            } catch (e: Exception) {
-                Result.failure(IllegalStateException(e.message ?: ERROR_UNKNOWN))
-            }
+    fun listenToSightings(
+        city: String = "",
+        onEvent: (List<SightingCloudModel>?, FirebaseFirestoreException?) -> Unit
+    ): ListenerRegistration {
+        var query = firestore.collection(COLLECTION_SIGHTINGS)
+            .orderBy(FIELD_CREATED_AT, Query.Direction.DESCENDING)
+        if (city.isNotBlank()) {
+            query = query.whereEqualTo(FIELD_TARGET_CITY, city)
         }
+        return query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                onEvent(null, error)
+                return@addSnapshotListener
+            }
+            val list = snapshot?.documents?.mapNotNull { doc ->
+                doc.toObject(SightingCloudModel::class.java)?.copy(sightingId = doc.id)
+            } ?: emptyList()
+            onEvent(list, null)
+        }
+    }
 
     suspend fun postSighting(sighting: SightingCloudModel): Result<String> =
         withContext(Dispatchers.IO) {

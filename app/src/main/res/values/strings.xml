@@ -53,12 +53,12 @@
     <!-- Scanner HUD dinámico -->
     <string name="hud_waiting_title">SISTEMA DE ESCANEO ACTIVO</string>
     <string name="hud_waiting_message">Analizando texto de la etiqueta… Apunta directamente a la tabla de ingredientes del empaque.</string>
-    <string name="hud_safe_title">PRODUCT VERIFIED SAFE</string>
-    <string name="hud_safe_message">0 allergen matches detected. This product is safe for your dietary profile.</string>
-    <string name="hud_danger_title">CRITICAL ALERT: Allergen Detected</string>
-    <string name="hud_danger_message">The AI processor identified %1$s in the ingredients. Consumption is not recommended.</string>
-    <string name="hud_warning_title">PRECAUCIÓN: Posible Alérgeno</string>
-    <string name="hud_warning_message">Se detectó posible coincidencia con %1$s. Verifica la etiqueta manualmente.</string>
+    <string name="hud_safe_title">PRODUCTO VERIFICADO - SEGURO</string>
+    <string name="hud_safe_message">0 coincidencias con tu perfil. Este producto es seguro.</string>
+    <string name="hud_danger_title">ALERTA - CONTIENE ALÉRGENOS</string>
+    <string name="hud_danger_message">Se identificó %1$s en los ingredientes. No se recomienda su consumo.</string>
+    <string name="hud_warning_title">PRECAUCIÓN / COMPONENTES DUDOSOS</string>
+    <string name="hud_warning_message">Posible coincidencia con %1$s. Verifica la etiqueta manualmente.</string>
     <string name="hud_error_message">Could not analyze the image. Try focusing the label better or use the gallery.</string>
 
     <!-- Alérgenos -->

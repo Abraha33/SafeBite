@@ -8,8 +8,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
 import unab.edu.co.abrahamcaceres.safebite.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -55,7 +54,11 @@ class MainActivity : AppCompatActivity() {
             .build()
 
         binding.bottomNav.setOnItemSelectedListener { item ->
-            navController.navigate(item.itemId, null, navOptions)
+            if (FirebaseAuth.getInstance().currentUser != null) {
+                navController.navigate(item.itemId, null, navOptions)
+            } else {
+                navController.navigate(R.id.action_global_login, null, navOptions)
+            }
             true
         }
     }

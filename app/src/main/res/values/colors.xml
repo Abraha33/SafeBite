@@ -17,6 +17,14 @@
     <color name="risk_danger_container">#FFFFEBEE</color>
     <color name="risk_danger_on">#FFB71C1C</color>
 
+    <!-- Scanner HUD colors (exact hex from design) -->
+    <color name="hud_safe_bg">#FF4CAF50</color>
+    <color name="hud_safe_text">#FFFFFFFF</color>
+    <color name="hud_warning_bg">#FFFFC107</color>
+    <color name="hud_warning_text">#FF000000</color>
+    <color name="hud_danger_bg">#FFF44336</color>
+    <color name="hud_danger_text">#FFFFFFFF</color>
+
     <!-- Scanner bottom bar -->
     <color name="scanner_bar_background">#F2181818</color>
     <color name="scanner_capture_button">#FF6750A4</color>

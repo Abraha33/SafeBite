@@ -21,17 +21,12 @@ class ScanHistoryViewModel(
     val scans: LiveData<List<ProductScan>> = repository.observeScans()
 
     /** Inserta un escaneo ya construido desde la capa de presentaciÃ³n. */
-    fun insertScan(scan: ProductScan) {
+    fun insertScan(scan: ProductScan, onInserted: ((Long) -> Unit)? = null) {
         if (scan.getDetectedText().isBlank()) return
         viewModelScope.launch {
-            repository.insert(scan)
+            val result = repository.insert(scan)
+            result.onSuccess { id -> onInserted?.invoke(id) }
         }
-    }
-
-    /** Inserta un escaneo (p. ej. tras OCR en el escÃ¡ner). */
-    fun insertScan(detectedText: String, riskLevel: String = ScanRisk.SAFE) {
-        if (detectedText.isBlank()) return
-        insertScan(ProductScan.crear(detectedText, riskLevel))
     }
 
     /** Elimina todo el historial de escaneos de Room. */
