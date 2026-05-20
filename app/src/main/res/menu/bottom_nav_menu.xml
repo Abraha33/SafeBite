@@ -5,6 +5,10 @@
         android:icon="@android:drawable/ic_menu_camera"
         android:title="@string/auth_scanner_title" />
     <item
+        android:id="@+id/communityFragment"
+        android:icon="@drawable/ic_search"
+        android:title="@string/community_title" />
+    <item
         android:id="@+id/scanHistoryFragment"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:title="@string/history_title" />

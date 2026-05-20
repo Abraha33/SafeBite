@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.community.CommunityFragment">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbarCommunity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorSurface"
+        app:title="@string/community_title">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:id="@+id/layoutCitySelector"
+            android:paddingEnd="12dp">
+
+            <TextView
+                android:id="@+id/textSelectedCity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/community_default_city"
+                android:textAppearance="?attr/textAppearanceTitleMedium"
+                android:textStyle="bold" />
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_arrow_dropdown"
+                android:contentDescription="@string/community_city_selector_cd"
+                app:tint="?attr/colorOnSurface" />
+        </LinearLayout>
+    </com.google.android.material.appbar.MaterialToolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCommunityFeed"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        android:paddingTop="8dp"
+        android:paddingBottom="88dp"
+        android:paddingHorizontal="12dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:visibility="gone"
+        tools:listitem="@layout/item_community_post" />
+
+    <LinearLayout
+        android:id="@+id/layoutEmptyFeed"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="visible"
+        android:padding="32dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_search"
+            android:contentDescription="@string/community_empty_cd"
+            android:alpha="0.3" />
+
+        <TextView
+            android:id="@+id/textEmptyFeed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:text="@string/community_empty"
+            android:textAppearance="?attr/textAppearanceBodyLarge"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+    </LinearLayout>
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fabPublishTip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:text="@string/community_fab_text"
+        android:contentDescription="@string/community_fab_cd"
+        app:icon="@android:drawable/ic_input_add"
+        app:backgroundTint="@color/scanner_capture_button"
+        app:iconTint="@color/white"
+        android:textColor="@color/white"
+        app:layout_anchor="@id/rvCommunityFeed"
+        app:layout_anchorGravity="bottom|right|end" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

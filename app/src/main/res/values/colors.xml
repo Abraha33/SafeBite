@@ -16,4 +16,8 @@
     <color name="risk_warning_on">#FFE65100</color>
     <color name="risk_danger_container">#FFFFEBEE</color>
     <color name="risk_danger_on">#FFB71C1C</color>
+
+    <!-- Scanner bottom bar -->
+    <color name="scanner_bar_background">#F2181818</color>
+    <color name="scanner_capture_button">#FF6750A4</color>
 </resources>

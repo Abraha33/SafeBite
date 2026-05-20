@@ -15,12 +15,9 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <!-- Pantalla de arranque (Android 12+ con compat hacia atrás vía androidx.core:core-splashscreen). -->
-    <style name="Theme.SafeBite.Splash" parent="Theme.SplashScreen">
-        <item name="windowSplashScreenBackground">@color/splash_background</item>
-        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash_logo</item>
-        <item name="postSplashScreenTheme">@style/Theme.SafeBite</item>
-        <item name="android:statusBarColor">@color/splash_background</item>
-        <item name="android:navigationBarColor">@color/splash_background</item>
+    <!-- Pantalla de arranque con layout personalizado -->
+    <style name="Theme.SafeBite.Splash" parent="Theme.SafeBite">
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/white</item>
     </style>
 </resources>

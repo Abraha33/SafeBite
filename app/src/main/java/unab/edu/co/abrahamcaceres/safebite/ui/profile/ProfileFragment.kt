@@ -7,15 +7,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.chip.Chip
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentProfileBinding
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ProfileViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ProfileViewModelFactory
 
-/**
- * Perfil del usuario autenticado con resumen simple de actividad y cierre de sesiÃ³n.
- */
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
@@ -37,11 +34,8 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbarProfile.setupWithNavController(findNavController())
         setupObservers()
-        binding.buttonLogout.setOnClickListener {
-            viewModel.logout()
-        }
+        setupLogout()
         viewModel.loadCurrentUser()
     }
 
@@ -55,11 +49,36 @@ class ProfileFragment : Fragment() {
             binding.textProfileScanSummary.text = getString(R.string.profile_scan_summary, total)
         }
 
+        viewModel.allergens.observe(viewLifecycleOwner) { allergens ->
+            binding.chipGroupAllergens.removeAllViews()
+            if (allergens.isNullOrEmpty()) {
+                binding.textAllergensEmpty.visibility = View.VISIBLE
+            } else {
+                binding.textAllergensEmpty.visibility = View.GONE
+                allergens.forEach { allergen ->
+                    val chip = Chip(requireContext()).apply {
+                        text = allergen.getDisplayName()
+                        isClickable = false
+                        isFocusable = false
+                        setChipBackgroundColorResource(R.color.risk_safe_container)
+                        setTextColor(resources.getColor(R.color.risk_safe_on, null))
+                    }
+                    binding.chipGroupAllergens.addView(chip)
+                }
+            }
+        }
+
         viewModel.shouldReturnToLogin.observe(viewLifecycleOwner) { shouldNavigate ->
             if (shouldNavigate) {
                 viewModel.consumeReturnToLogin()
-                findNavController().navigate(R.id.action_profile_to_login)
+                findNavController().navigate(R.id.action_global_login)
             }
+        }
+    }
+
+    private fun setupLogout() {
+        binding.buttonLogout.setOnClickListener {
+            viewModel.logout()
         }
     }
 

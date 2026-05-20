@@ -5,6 +5,12 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/loginFragment">
 
+    <action
+        android:id="@+id/action_global_login"
+        app:destination="@id/loginFragment"
+        app:popUpTo="@id/loginFragment"
+        app:popUpToInclusive="true" />
+
     <fragment
         android:id="@+id/loginFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.LoginFragment"
@@ -30,7 +36,17 @@
         android:id="@+id/scannerFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.auth.ScannerFragment"
         android:label="@string/auth_scanner_title"
-        tools:layout="@layout/fragment_scanner" />
+        tools:layout="@layout/fragment_scanner">
+        <action
+            android:id="@+id/action_scanner_to_profile"
+            app:destination="@id/profileFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/communityFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.community.CommunityFragment"
+        android:label="@string/community_title"
+        tools:layout="@layout/fragment_community" />
 
     <fragment
         android:id="@+id/allergensFragment"

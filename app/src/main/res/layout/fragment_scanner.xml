@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:keepScreenOn="true"
     tools:context=".ui.auth.ScannerFragment">
 
     <androidx.camera.view.PreviewView
@@ -31,14 +32,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/textHudIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="28sp"
-                tools:text="🛡️" />
+                tools:text="\uD83D\uDEE1\uFE0F" />
 
             <TextView
                 android:id="@+id/textHudTitle"
@@ -56,21 +57,90 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="@string/scanner_status_waiting_sub"
-                android:textAppearance="?attr/textAppearanceBodyMedium" />
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                tools:text="Analizando texto de la etiqueta…" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/buttonOpenGallery"
-        style="@style/Widget.Material3.Button.TonalButton"
-        android:layout_width="0dp"
+    <com.google.android.material.chip.Chip
+        android:id="@+id/chipDetectedIngredient"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="24dp"
-        android:text="@string/scanner_open_gallery"
-        app:icon="@android:drawable/ic_menu_gallery"
+        android:visibility="gone"
+        app:chipBackgroundColor="@color/risk_danger_container"
+        app:chipIconTint="@color/risk_danger_on"
+        app:chipStrokeWidth="0dp"
+        app:iconStartPadding="6dp"
+        android:paddingHorizontal="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/focusReticle"
+        app:layout_constraintTop_toTopOf="@+id/focusReticle"
+        tools:visibility="visible"
+        tools:text="lactosa" />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/focusReticle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/focus_reticle"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/bottomBarBackground"
+        android:layout_width="match_parent"
+        android:layout_height="96dp"
+        android:background="@color/scanner_bar_background"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonOpenGallery"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/scanner_gallery_cd"
+        app:icon="@drawable/ic_gallery"
+        app:iconSize="24dp"
+        app:iconTint="@color/white"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Avatar.Circle"
+        app:backgroundTint="#33FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/bottomBarBackground"
+        app:layout_constraintEnd_toStartOf="@id/buttonCapture"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/bottomBarBackground" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonCapture"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:contentDescription="@string/scanner_capture_cd"
+        android:backgroundTint="@color/scanner_capture_button"
+        app:icon="@drawable/ic_capture_focus"
+        app:iconSize="36dp"
+        app:iconTint="@color/white"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Avatar.Circle"
+        app:layout_constraintBottom_toBottomOf="@id/bottomBarBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/bottomBarBackground" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/buttonProfile"
+        style="@style/Widget.Material3.Button.IconButton"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="@string/scanner_profile_cd"
+        app:icon="@drawable/ic_profile"
+        app:iconSize="24dp"
+        app:iconTint="@color/white"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Avatar.Circle"
+        app:backgroundTint="#33FFFFFF"
+        app:layout_constraintBottom_toBottomOf="@id/bottomBarBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/buttonCapture"
+        app:layout_constraintTop_toTopOf="@id/bottomBarBackground" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

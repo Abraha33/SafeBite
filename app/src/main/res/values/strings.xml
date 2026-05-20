@@ -25,6 +25,16 @@
 
     <string name="register_ok">Registro guardado correctamente.</string>
     <string name="login_ok">Bienvenido a SafeBite.</string>
+    <string name="action_back">Volver</string>
+    <string name="remember_me">Recordar mis datos</string>
+    <string name="login_email_saved">Correo guardado</string>
+
+    <!-- Registro - Restricciones dietéticas -->
+    <string name="auth_diet_label">Selecciona tus restricciones dietéticas</string>
+    <string name="auth_diet_gluten">Sin Gluten</string>
+    <string name="auth_diet_lactose">Sin Lactosa</string>
+    <string name="auth_diet_vegan">Vegano</string>
+    <string name="auth_diet_peanut">Sin Maní</string>
 
     <!-- Scanner -->
     <string name="auth_scanner_title">Escáner de etiquetas</string>
@@ -86,6 +96,8 @@
     <string name="profile_scan_summary">%1$d escaneos registrados</string>
     <string name="profile_logout_button">Cerrar sesión</string>
     <string name="profile_avatar_cd">Foto de perfil</string>
+    <string name="profile_health_title">Mi Configuración de Salud</string>
+    <string name="profile_health_empty">Sin alérgenos configurados</string>
 
     <!-- Historial - vacío -->
     <string name="history_empty_cd">Sin escaneos aún</string>
@@ -106,4 +118,28 @@
     <string name="risk_safe">Seguro</string>
     <string name="risk_warning">Precaución</string>
     <string name="risk_danger">Peligro</string>
+
+    <!-- Scanner bottom bar -->
+    <string name="scanner_gallery_cd">Abrir galería</string>
+    <string name="scanner_capture_cd">Analizar etiqueta</string>
+    <string name="scanner_profile_cd">Ir a mi perfil</string>
+
+    <!-- Comunidad Inteligente -->
+    <string name="community_title">Comunidad</string>
+    <string name="community_default_city">Bucaramanga</string>
+    <string name="community_city_selector_cd">Seleccionar ciudad</string>
+    <string name="community_empty">No hay publicaciones en esta ciudad. ¡Sé el primero en compartir un tip!</string>
+    <string name="community_empty_cd">Feed vacío</string>
+    <string name="community_fab_text">+ Compartir Tip</string>
+    <string name="community_fab_cd">Publicar un tip en la comunidad</string>
+    <string name="community_pin_cd">Ubicación</string>
+    <string name="community_city_dialog_title">Seleccionar ciudad</string>
+
+    <string-array name="cities">
+        <item>Todas las ciudades</item>
+        <item>Bucaramanga</item>
+        <item>Floridablanca</item>
+        <item>Girón</item>
+        <item>Piedecuesta</item>
+    </string-array>
 </resources>

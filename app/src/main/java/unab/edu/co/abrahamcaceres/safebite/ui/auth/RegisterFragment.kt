@@ -15,9 +15,6 @@ import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentRegisterBinding
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AuthViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AuthViewModelFactory
 
-/**
- * Registro con validación en ViewModel y persistencia Room; vuelve al login vía Navigation.
- */
 class RegisterFragment : Fragment() {
 
     private var _binding: FragmentRegisterBinding? = null
@@ -38,8 +35,15 @@ class RegisterFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         setupObservers()
         setupListeners()
+    }
+
+    private fun setupToolbar() {
+        binding.toolbarRegister.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     private fun setupObservers() {
@@ -57,7 +61,6 @@ class RegisterFragment : Fragment() {
                 viewModel.consumeRegisterSuccess()
                 val email = binding.inputEmail.text?.toString().orEmpty().trim()
                 Toast.makeText(requireContext(), R.string.register_ok, Toast.LENGTH_SHORT).show()
-                // Pasa el correo al fragmento de login usando el back stack entry anterior.
                 findNavController().previousBackStackEntry?.savedStateHandle?.set(
                     LoginFragment.KEY_PREFILL_EMAIL,
                     email
@@ -77,10 +80,6 @@ class RegisterFragment : Fragment() {
             val email = binding.inputEmail.text?.toString().orEmpty()
             val password = binding.inputPassword.text?.toString().orEmpty()
             viewModel.validateAndRegister(name, email, password)
-        }
-
-        binding.buttonGoLogin.setOnClickListener {
-            findNavController().popBackStack()
         }
     }
 

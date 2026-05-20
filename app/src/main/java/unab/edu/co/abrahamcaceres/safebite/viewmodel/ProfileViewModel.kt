@@ -7,18 +7,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import unab.edu.co.abrahamcaceres.safebite.data.repository.AllergenRepository
 import unab.edu.co.abrahamcaceres.safebite.data.repository.ScanHistoryRepository
 import unab.edu.co.abrahamcaceres.safebite.data.repository.UserRepository
+import unab.edu.co.abrahamcaceres.safebite.model.Allergen
 import unab.edu.co.abrahamcaceres.safebite.model.User
 import unab.edu.co.abrahamcaceres.safebite.utils.SessionManager
 
-/**
- * ViewModel del perfil: resuelve el usuario en sesiÃ³n y un resumen bÃ¡sico de actividad.
- */
 class ProfileViewModel(
     application: Application,
     private val userRepository: UserRepository,
-    scanHistoryRepository: ScanHistoryRepository
+    scanHistoryRepository: ScanHistoryRepository,
+    private val allergenRepository: AllergenRepository
 ) : AndroidViewModel(application) {
 
     private val sessionManager = SessionManager(application.applicationContext)
@@ -28,6 +28,8 @@ class ProfileViewModel(
 
     private val _shouldReturnToLogin = MutableLiveData(false)
     val shouldReturnToLogin: LiveData<Boolean> = _shouldReturnToLogin
+
+    val allergens: LiveData<List<Allergen>> = allergenRepository.observeAllergens()
 
     val scanCount: LiveData<Int> = scanHistoryRepository.observeScans().map { scans ->
         scans?.size ?: 0

@@ -24,6 +24,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
@@ -61,6 +62,7 @@ class ScannerFragment : Fragment() {
     private var allergenKeywords: List<AllergenKeyword> = emptyList()
 
     private var lastPersistedFingerprint: String? = null
+    private var latestRecognizedText: String? = null
 
     private val cameraPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -129,6 +131,49 @@ class ScannerFragment : Fragment() {
         binding.buttonOpenGallery.setOnClickListener {
             galleryLauncher.launch("image/*")
         }
+
+        binding.buttonCapture.setOnClickListener {
+            captureCurrentScan()
+        }
+
+        binding.buttonProfile.setOnClickListener {
+            findNavController().navigate(R.id.action_scanner_to_profile)
+        }
+    }
+
+    private fun captureCurrentScan() {
+        val text = latestRecognizedText
+        if (text.isNullOrBlank()) {
+            vibrateDangerFeedback()
+            renderDynamicHUD(
+                icon = "\u26A0\uFE0F",
+                title = getString(R.string.scanner_status_waiting),
+                message = getString(R.string.hud_error_message),
+                style = HudStyle.WARNING
+            )
+            return
+        }
+        val normalizedText = text.trim().lowercase(Locale.getDefault())
+        val detectedAllergens = allergenKeywords
+            .filter { normalizedText.contains(it.normalizedName) }
+            .map { it.displayName }
+            .distinct()
+
+        val riskLevel = if (detectedAllergens.isNotEmpty()) ScanRisk.DANGER else ScanRisk.SAFE
+        val fingerprint = "$riskLevel|$normalizedText"
+        if (fingerprint == lastPersistedFingerprint) return
+
+        lastPersistedFingerprint = fingerprint
+        if (riskLevel == ScanRisk.DANGER) {
+            vibrateDangerFeedback()
+        }
+
+        scanHistoryViewModel.insertScan(
+            ProductScan.crear(
+                textoDetectado = text,
+                nivelRiesgo = riskLevel
+            )
+        )
     }
 
     private fun configurePreview() {
@@ -241,6 +286,7 @@ class ScannerFragment : Fragment() {
     private fun handleRecognizedText(recognizedText: String) {
         val currentBinding = _binding ?: return
         val normalizedText = recognizedText.trim().lowercase(Locale.getDefault())
+        latestRecognizedText = recognizedText
 
         if (normalizedText.isBlank()) {
             currentBinding.root.post {
@@ -262,6 +308,7 @@ class ScannerFragment : Fragment() {
         currentBinding.root.post {
             if (detectedAllergens.isNotEmpty()) {
                 val allergensStr = detectedAllergens.joinToString(", ")
+                showDetectedChip(allergensStr)
                 renderDynamicHUD(
                     icon = "\uD83D\uDEA8",
                     title = getString(R.string.hud_danger_title),
@@ -273,6 +320,7 @@ class ScannerFragment : Fragment() {
                     riskLevel = ScanRisk.DANGER
                 )
             } else {
+                hideDetectedChip()
                 renderDynamicHUD(
                     icon = "\uD83D\uDEE1\uFE0F",
                     title = getString(R.string.hud_safe_title),
@@ -285,6 +333,17 @@ class ScannerFragment : Fragment() {
                 )
             }
         }
+    }
+
+    private fun showDetectedChip(allergenText: String) {
+        binding.chipDetectedIngredient.apply {
+            text = "\u26A0\uFE0F $allergenText"
+            visibility = View.VISIBLE
+        }
+    }
+
+    private fun hideDetectedChip() {
+        binding.chipDetectedIngredient.visibility = View.GONE
     }
 
     private fun handleAnalysisError(error: Exception) {
@@ -352,11 +411,7 @@ class ScannerFragment : Fragment() {
         val newBg = ContextCompat.getColor(ctx, bgColor)
         val newText = ContextCompat.getColor(ctx, textColor)
 
-        val currentBg = (card.cardBackgroundColor.defaultColor ?: newBg).let {
-            card.cardBackgroundColor.defaultColor
-        }
-
-        ValueAnimator.ofObject(ArgbEvaluator(), currentBg, newBg).apply {
+        ValueAnimator.ofObject(ArgbEvaluator(), card.cardBackgroundColor.defaultColor, newBg).apply {
             duration = 350
             addUpdateListener { animator ->
                 card.setCardBackgroundColor(animator.animatedValue as Int)

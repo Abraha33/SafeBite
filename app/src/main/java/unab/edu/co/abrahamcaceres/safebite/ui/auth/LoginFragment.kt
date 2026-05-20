@@ -4,20 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputLayout
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentLoginBinding
+import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
+import unab.edu.co.abrahamcaceres.safebite.utils.SessionManager
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AuthViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.AuthViewModelFactory
 
-/**
- * Pantalla de inicio de sesión dentro del NavHost (Navigation Component + MVVM).
- */
 class LoginFragment : Fragment() {
 
     private var _binding: FragmentLoginBinding? = null
@@ -26,6 +26,8 @@ class LoginFragment : Fragment() {
     private val viewModel: AuthViewModel by viewModels {
         AuthViewModelFactory(requireActivity().application)
     }
+
+    private lateinit var sessionManager: SessionManager
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,15 +41,14 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        sessionManager = SessionManager(requireContext())
+
         observePrefillEmail()
+        loadRememberedCredentials()
         setupObservers()
         setupListeners()
     }
 
-    /**
-     * Si el registro guardó un correo en el SavedStateHandle del destino anterior,
-     * lo aplicamos al campo (comunicación entre fragmentos sin Intent).
-     */
     private fun observePrefillEmail() {
         findNavController().currentBackStackEntry?.savedStateHandle
             ?.getLiveData<String>(KEY_PREFILL_EMAIL)
@@ -60,6 +61,18 @@ class LoginFragment : Fragment() {
             }
     }
 
+    private fun loadRememberedCredentials() {
+        val email = sessionManager.getRememberedEmail()
+        val password = sessionManager.getRememberedPassword()
+        if (email != null) {
+            binding.inputEmail.setText(email)
+            binding.checkboxRememberMe.isChecked = true
+        }
+        if (password != null) {
+            binding.inputPassword.setText(password)
+        }
+    }
+
     private fun setupObservers() {
         viewModel.emailError.observe(viewLifecycleOwner) { message ->
             setError(binding.layoutEmail, message)
@@ -70,8 +83,14 @@ class LoginFragment : Fragment() {
         viewModel.loginSuccess.observe(viewLifecycleOwner) { success ->
             if (success) {
                 viewModel.consumeLoginSuccess()
+                if (binding.checkboxRememberMe.isChecked) {
+                    val email = binding.inputEmail.text?.toString().orEmpty()
+                    val password = binding.inputPassword.text?.toString().orEmpty()
+                    sessionManager.saveRememberedCredentials(email, password)
+                } else {
+                    sessionManager.clearRememberedCredentials()
+                }
                 Toast.makeText(requireContext(), R.string.login_ok, Toast.LENGTH_SHORT).show()
-                // Navigation Component: acción con popUpTo definido en nav_graph.xml
                 findNavController().navigate(R.id.action_login_to_scanner)
             }
         }
@@ -81,15 +100,37 @@ class LoginFragment : Fragment() {
         binding.inputEmail.doAfterTextChanged { binding.layoutEmail.error = null }
         binding.inputPassword.doAfterTextChanged { binding.layoutPassword.error = null }
 
-        binding.buttonLogin.setOnClickListener {
+        binding.btnLogin.setOnClickListener {
+            hideKeyboard()
             val email = binding.inputEmail.text?.toString().orEmpty()
             val password = binding.inputPassword.text?.toString().orEmpty()
+
+            if (!validateFields(email, password)) return@setOnClickListener
             viewModel.validateAndLogin(email, password)
         }
 
-        binding.buttonGoRegister.setOnClickListener {
+        binding.btnGoToRegister.setOnClickListener {
             findNavController().navigate(R.id.action_login_to_register)
         }
+    }
+
+    private fun validateFields(email: String, password: String): Boolean {
+        var valid = true
+
+        if (!InputValidators.isNotBlank(email) || !InputValidators.isValidEmail(email)) {
+            binding.layoutEmail.error = getString(R.string.error_email_invalid)
+            valid = false
+        }
+        if (!InputValidators.isNotBlank(password) || !InputValidators.isValidPassword(password)) {
+            binding.layoutPassword.error = getString(R.string.error_password_short)
+            valid = false
+        }
+        return valid
+    }
+
+    private fun hideKeyboard() {
+        val imm = requireContext().getSystemService(android.content.Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(binding.btnLogin.windowToken, 0)
     }
 
     private fun setError(layout: TextInputLayout, message: String?) {
@@ -103,7 +144,6 @@ class LoginFragment : Fragment() {
     }
 
     companion object {
-        /** Clave en SavedStateHandle para precargar el correo tras un registro exitoso. */
         const val KEY_PREFILL_EMAIL = "prefill_email"
     }
 }
