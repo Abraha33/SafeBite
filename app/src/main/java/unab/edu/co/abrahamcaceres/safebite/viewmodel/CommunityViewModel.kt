@@ -15,16 +15,16 @@ class CommunityViewModel(
     private val repository: SightingRepository
 ) : AndroidViewModel(application) {
 
-    private val _selectedCity = MutableLiveData<String?>(null)
+    private val _selectedCity = MutableLiveData<String>("")
 
     val sightings: LiveData<List<Sighting>> = _selectedCity.switchMap { city ->
-        if (city.isNullOrBlank()) repository.observeAll()
+        if (city.isBlank()) repository.observeAll()
         else repository.observeByCity(city)
     }
 
-    val selectedCity: LiveData<String?> = _selectedCity
+    val selectedCity: LiveData<String> = _selectedCity
 
-    fun filterByCity(city: String?) {
+    fun filterByCity(city: String) {
         _selectedCity.value = city
     }
 
@@ -47,64 +47,58 @@ class CommunityViewModel(
     private suspend fun seedSampleData() {
         val samples = listOf(
             Sighting.crear(
+                creatorName = "Chef María",
+                timeAgo = "Hace 16 horas",
                 productName = "Harina de Almendras",
                 storeName = "Store v. Bucaramanga",
-                price = "$12.900 COP",
                 communityTip = "Precio especial por mayoreo. Perfecta para repostería libre de gluten.",
-                city = "Bucaramanga",
-                allergenTag = "✓ 100% Seguro",
-                latitude = 7.1254,
-                longitude = -73.1198
+                targetCity = "Bucaramanga",
+                allergenTag = "Gluten-Free"
             ),
             Sighting.crear(
+                creatorName = "Carlos Ruiz",
+                timeAgo = "Hace 2 días",
                 productName = "Leche de Soya NutriVeg",
                 storeName = "Supermercado Los Andes",
-                price = "$8.500 COP",
-                communityTip = "Nueva marca, leche vegetal fortificada con calcio. Ideal para intolerantes a lactosa pero contiene soya.",
-                city = "Piedecuesta",
-                allergenTag = "Contiene Soja",
-                latitude = 6.9896,
-                longitude = -73.0536
+                communityTip = "Leche vegetal fortificada con calcio. Ideal para intolerantes a lactosa pero contiene soya.",
+                targetCity = "Piedecuesta",
+                allergenTag = "Contiene Soja"
             ),
             Sighting.crear(
+                creatorName = "Laura Medina",
+                timeAgo = "Hace 3 días",
                 productName = "Galletas de Avena sin Azúcar",
                 storeName = "Éxito v. Bucaramanga",
-                price = "$6.200 COP",
-                communityTip = "Sección saludable. Etiqueta 'libre de azúcar' pero advierten trazas de trigo.",
-                city = "Bucaramanga",
-                allergenTag = "Trazas de Gluten",
-                latitude = 7.1186,
-                longitude = -73.1161
+                communityTip = "Sección saludable. Etiqueta sin azúcar pero advierten trazas de trigo.",
+                targetCity = "Bucaramanga",
+                allergenTag = "Trazas de Gluten"
             ),
             Sighting.crear(
+                creatorName = "Pedro Sánchez",
+                timeAgo = "Hace 5 días",
                 productName = "Queso Vegano de Castañas",
                 storeName = "Feria Orgánica Floridablanca",
-                price = "$15.000 COP",
-                communityTip = "Producto artesanal. Libre de lácteos, gluten y soya. Altamente recomendado.",
-                city = "Floridablanca",
-                allergenTag = "✓ 100% Seguro",
-                latitude = 7.0648,
-                longitude = -73.0894
+                communityTip = "Producto artesanal. Libre de lácteos, gluten y soya.",
+                targetCity = "Floridablanca",
+                allergenTag = "Lactose-Free"
             ),
             Sighting.crear(
+                creatorName = "Ana López",
+                timeAgo = "Hace 1 semana",
                 productName = "Barra Energética EnergyGo",
                 storeName = "SportLife v. Girón",
-                price = "$4.500 COP",
                 communityTip = "Tiene maní como segundo ingrediente. No apta para alérgicos.",
-                city = "Girón",
-                allergenTag = "Contiene Maní",
-                latitude = 7.0682,
-                longitude = -73.1697
+                targetCity = "Girón",
+                allergenTag = "Contiene Maní"
             ),
             Sighting.crear(
+                creatorName = "Sofía Torres",
+                timeAgo = "Hace 1 semana",
                 productName = "Pan Integral Sin TACC",
                 storeName = "Nature's v. Bucaramanga",
-                price = "$10.200 COP",
-                communityTip = "Panificadora 'Sin Límites'. Certificado libre de gluten, apto celíacos.",
-                city = "Bucaramanga",
-                allergenTag = "✓ 100% Seguro",
-                latitude = 7.1295,
-                longitude = -73.1227
+                communityTip = "Certificado libre de gluten, apto celíacos.",
+                targetCity = "Bucaramanga",
+                allergenTag = "Gluten-Free"
             )
         )
         samples.forEach { repository.insert(it) }

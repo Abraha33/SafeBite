@@ -31,11 +31,12 @@ class CommunityAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(sighting: Sighting) {
+            binding.textCreatorName.text = sighting.getCreatorName()
+            binding.textTimeAgo.text = sighting.getTimeAgo()
             binding.textProductName.text = sighting.getProductName()
             binding.textStoreName.text = sighting.getStoreName()
-            binding.textPrice.text = sighting.getPrice()
             binding.textCommunityTip.text = sighting.getCommunityTip()
-            binding.textCity.text = sighting.getCity()
+            binding.textTargetCity.text = sighting.getTargetCity()
             binding.textAllergenTag.text = sighting.getAllergenTag()
 
             bindAllergenColors(sighting)
@@ -46,8 +47,8 @@ class CommunityAdapter(
         private fun bindAllergenColors(sighting: Sighting) {
             val ctx = binding.root.context
             val tag = sighting.getAllergenTag()
-            val isSafe = tag.contains("Seguro", ignoreCase = true) ||
-                tag.contains("✓", ignoreCase = true)
+            val isSafe = tag.contains("Free", ignoreCase = true) ||
+                tag.contains("Seguro", ignoreCase = true)
 
             val bgRes = if (isSafe) R.color.risk_safe_on else R.color.risk_danger_on
             binding.cardAllergenAlert.setCardBackgroundColor(
@@ -67,6 +68,6 @@ class CommunityAdapter(
             oldItem.getProductName() == newItem.getProductName() &&
                 oldItem.getCommunityTip() == newItem.getCommunityTip() &&
                 oldItem.getAllergenTag() == newItem.getAllergenTag() &&
-                oldItem.getPrice() == newItem.getPrice()
+                oldItem.getTimeAgo() == newItem.getTimeAgo()
     }
 }

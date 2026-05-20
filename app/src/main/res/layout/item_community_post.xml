@@ -18,10 +18,51 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/ic_profile"
+                android:contentDescription="@string/profile_avatar_cd"
+                android:backgroundTint="?attr/colorPrimaryContainer"
+                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.Avatar.Circle"
+                app:tint="?attr/colorOnPrimaryContainer" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/textCreatorName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceLabelLarge"
+                    android:textStyle="bold"
+                    tools:text="Chef María" />
+
+                <TextView
+                    android:id="@+id/textTimeAgo"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    tools:text="Hace 16 horas" />
+            </LinearLayout>
+        </LinearLayout>
+
         <TextView
             android:id="@+id/textProductName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
             android:textAppearance="?attr/textAppearanceTitleMedium"
             android:textStyle="bold"
             tools:text="Harina de Almendras" />
@@ -35,45 +76,28 @@
             android:textColor="?attr/colorOnSurfaceVariant"
             tools:text="Store v. Bucaramanga" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardAllergenAlert"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            app:contentPadding="0dp">
 
             <TextView
-                android:id="@+id/textPrice"
+                android:id="@+id/textAllergenTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?attr/textAppearanceLabelLarge"
-                android:textStyle="bold"
-                android:textColor="?attr/colorPrimary"
-                tools:text="$12.900 COP" />
-
-            <com.google.android.material.card.MaterialCardView
-                android:id="@+id/cardAllergenAlert"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                app:cardCornerRadius="8dp"
-                app:cardElevation="0dp"
-                app:strokeWidth="0dp"
-                app:contentPadding="0dp">
-
-                <TextView
-                    android:id="@+id/textAllergenTag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="4dp"
-                    android:paddingBottom="4dp"
-                    android:textColor="@android:color/white"
-                    android:textAppearance="?attr/textAppearanceLabelSmall"
-                    tools:text="✓ 100% Seguro" />
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="6dp"
+                android:textColor="@android:color/white"
+                android:textAppearance="?attr/textAppearanceLabelMedium"
+                tools:text="Gluten-Free" />
+        </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/textCommunityTip"
@@ -104,7 +128,7 @@
                 android:contentDescription="@string/community_pin_cd" />
 
             <TextView
-                android:id="@+id/textCity"
+                android:id="@+id/textTargetCity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"

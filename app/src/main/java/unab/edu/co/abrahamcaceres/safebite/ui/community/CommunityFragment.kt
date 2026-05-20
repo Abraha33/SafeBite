@@ -69,7 +69,7 @@ class CommunityFragment : Fragment() {
                 .setSingleChoiceItems(cities, checkedIndex) { dialog, which ->
                     dialog.dismiss()
                     val selected = cities[which]
-                    val filterValue = if (which == 0) null else selected
+                    val filterValue = if (which == 0) "" else selected
                     viewModel.filterByCity(filterValue)
                     binding.textSelectedCity.text = selected
                 }
@@ -81,12 +81,13 @@ class CommunityFragment : Fragment() {
         binding.fabPublishTip.setOnClickListener {
             viewModel.publishSighting(
                 Sighting.crear(
+                    creatorName = "Tú",
+                    timeAgo = "Ahora",
                     productName = "Nuevo producto",
                     storeName = "Tienda local",
-                    price = "Consultar precio",
                     communityTip = "Comparte tu experiencia con la comunidad...",
-                    city = binding.textSelectedCity.text.toString(),
-                    allergenTag = "✓ 100% Seguro"
+                    targetCity = binding.textSelectedCity.text.toString(),
+                    allergenTag = "Gluten-Free"
                 )
             )
         }
