@@ -45,12 +45,8 @@ class ProfileFragment : Fragment() {
             binding.textProfileEmail.text = user?.getEmail().orEmpty()
         }
 
-        viewModel.scanCount.observe(viewLifecycleOwner) { total ->
-            binding.textProfileScanSummary.text = getString(R.string.profile_scan_summary, total)
-        }
-
         viewModel.allergens.observe(viewLifecycleOwner) { allergens ->
-            binding.chipGroupAllergens.removeAllViews()
+            binding.chipGroupProfileAllergens.removeAllViews()
             if (allergens.isNullOrEmpty()) {
                 binding.textAllergensEmpty.visibility = View.VISIBLE
             } else {
@@ -63,7 +59,7 @@ class ProfileFragment : Fragment() {
                         setChipBackgroundColorResource(R.color.risk_safe_container)
                         setTextColor(resources.getColor(R.color.risk_safe_on, null))
                     }
-                    binding.chipGroupAllergens.addView(chip)
+                    binding.chipGroupProfileAllergens.addView(chip)
                 }
             }
         }
@@ -77,7 +73,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupLogout() {
-        binding.buttonLogout.setOnClickListener {
+        binding.btnLogout.setOnClickListener {
             viewModel.logout()
         }
     }
