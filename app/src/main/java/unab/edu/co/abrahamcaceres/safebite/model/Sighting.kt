@@ -17,6 +17,8 @@ class Sighting(
     private var productName: String = "",
     @ColumnInfo(name = "store_name")
     private var storeName: String = "",
+    @ColumnInfo(name = "price")
+    private var price: String = "",
     @ColumnInfo(name = "community_tip")
     private var communityTip: String = "",
     @ColumnInfo(name = "target_city")
@@ -30,6 +32,7 @@ class Sighting(
     fun getTimeAgo(): String = timeAgo
     fun getProductName(): String = productName
     fun getStoreName(): String = storeName
+    fun getPrice(): String = price
     fun getCommunityTip(): String = communityTip
     fun getTargetCity(): String = targetCity
     fun getAllergenTag(): String = allergenTag
@@ -40,6 +43,7 @@ class Sighting(
             timeAgo: String,
             productName: String,
             storeName: String,
+            price: String = "",
             communityTip: String,
             targetCity: String,
             allergenTag: String
@@ -50,6 +54,7 @@ class Sighting(
                 timeAgo = timeAgo.trim(),
                 productName = productName.trim(),
                 storeName = storeName.trim(),
+                price = price.trim(),
                 communityTip = communityTip.trim(),
                 targetCity = targetCity.trim(),
                 allergenTag = allergenTag.trim()

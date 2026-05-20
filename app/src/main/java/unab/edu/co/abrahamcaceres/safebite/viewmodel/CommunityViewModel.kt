@@ -51,6 +51,7 @@ class CommunityViewModel(
                 timeAgo = "Hace 16 horas",
                 productName = "Harina de Almendras",
                 storeName = "Store v. Bucaramanga",
+                price = "$12.900",
                 communityTip = "Precio especial por mayoreo. Perfecta para repostería libre de gluten.",
                 targetCity = "Bucaramanga",
                 allergenTag = "Gluten-Free"
@@ -60,6 +61,7 @@ class CommunityViewModel(
                 timeAgo = "Hace 2 días",
                 productName = "Leche de Soya NutriVeg",
                 storeName = "Supermercado Los Andes",
+                price = "$8.500",
                 communityTip = "Leche vegetal fortificada con calcio. Ideal para intolerantes a lactosa pero contiene soya.",
                 targetCity = "Piedecuesta",
                 allergenTag = "Contiene Soja"
@@ -69,6 +71,7 @@ class CommunityViewModel(
                 timeAgo = "Hace 3 días",
                 productName = "Galletas de Avena sin Azúcar",
                 storeName = "Éxito v. Bucaramanga",
+                price = "$6.200",
                 communityTip = "Sección saludable. Etiqueta sin azúcar pero advierten trazas de trigo.",
                 targetCity = "Bucaramanga",
                 allergenTag = "Trazas de Gluten"
@@ -78,6 +81,7 @@ class CommunityViewModel(
                 timeAgo = "Hace 5 días",
                 productName = "Queso Vegano de Castañas",
                 storeName = "Feria Orgánica Floridablanca",
+                price = "$15.000",
                 communityTip = "Producto artesanal. Libre de lácteos, gluten y soya.",
                 targetCity = "Floridablanca",
                 allergenTag = "Lactose-Free"
@@ -87,6 +91,7 @@ class CommunityViewModel(
                 timeAgo = "Hace 1 semana",
                 productName = "Barra Energética EnergyGo",
                 storeName = "SportLife v. Girón",
+                price = "$4.500",
                 communityTip = "Tiene maní como segundo ingrediente. No apta para alérgicos.",
                 targetCity = "Girón",
                 allergenTag = "Contiene Maní"
@@ -96,6 +101,7 @@ class CommunityViewModel(
                 timeAgo = "Hace 1 semana",
                 productName = "Pan Integral Sin TACC",
                 storeName = "Nature's v. Bucaramanga",
+                price = "$10.200",
                 communityTip = "Certificado libre de gluten, apto celíacos.",
                 targetCity = "Bucaramanga",
                 allergenTag = "Gluten-Free"

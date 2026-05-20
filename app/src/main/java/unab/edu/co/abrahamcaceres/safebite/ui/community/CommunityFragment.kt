@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import unab.edu.co.abrahamcaceres.safebite.R
@@ -79,17 +80,7 @@ class CommunityFragment : Fragment() {
 
     private fun setupFab() {
         binding.fabPublishTip.setOnClickListener {
-            viewModel.publishSighting(
-                Sighting.crear(
-                    creatorName = "Tú",
-                    timeAgo = "Ahora",
-                    productName = "Nuevo producto",
-                    storeName = "Tienda local",
-                    communityTip = "Comparte tu experiencia con la comunidad...",
-                    targetCity = binding.textSelectedCity.text.toString(),
-                    allergenTag = "Gluten-Free"
-                )
-            )
+            findNavController().navigate(R.id.action_community_to_add_sighting)
         }
     }
 

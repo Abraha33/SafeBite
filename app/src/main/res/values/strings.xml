@@ -138,6 +138,21 @@
     <string name="community_allergen_alert">⚠️ Alerta: Contiene %1$s</string>
     <string name="search_cd">Buscar</string>
 
+    <!-- Add Sighting form -->
+    <string name="add_sighting_title">Compartir en Comunidad</string>
+    <string name="add_sighting_back_cd">Regresar al muro</string>
+    <string name="add_sighting_product_hint">Nombre del Producto o Receta</string>
+    <string name="add_sighting_store_hint">Establecimiento / Supermercado</string>
+    <string name="add_sighting_price_hint">Precio Estimado</string>
+    <string name="add_sighting_tip_hint">Tip o Consejo para la Comunidad</string>
+    <string name="add_sighting_allergen_label">Etiqueta de Salud</string>
+    <string name="add_sighting_publish">Publicar en Muro Social</string>
+    <string name="add_sighting_chip_gluten">Sin Gluten</string>
+    <string name="add_sighting_chip_lactose">Sin Lactosa</string>
+    <string name="add_sighting_chip_vegan">Vegano</string>
+    <string name="add_sighting_chip_peanut">Sin Maní</string>
+    <string name="add_sighting_chip_sugar">Sin Azúcar</string>
+
     <string-array name="cities">
         <item>Todas las ciudades</item>
         <item>Bucaramanga</item>

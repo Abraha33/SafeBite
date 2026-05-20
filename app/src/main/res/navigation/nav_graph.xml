@@ -46,7 +46,17 @@
         android:id="@+id/communityFragment"
         android:name="unab.edu.co.abrahamcaceres.safebite.ui.community.CommunityFragment"
         android:label="@string/community_title"
-        tools:layout="@layout/fragment_community" />
+        tools:layout="@layout/fragment_community">
+        <action
+            android:id="@+id/action_community_to_add_sighting"
+            app:destination="@id/addSightingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/addSightingFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.community.AddSightingFragment"
+        android:label="@string/add_sighting_title"
+        tools:layout="@layout/fragment_add_sighting" />
 
     <fragment
         android:id="@+id/allergensFragment"

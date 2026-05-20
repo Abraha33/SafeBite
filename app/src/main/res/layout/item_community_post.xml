@@ -67,6 +67,16 @@
             android:textStyle="bold"
             tools:text="Harina de Almendras" />
 
+        <TextView
+            android:id="@+id/textPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textAppearance="?attr/textAppearanceLabelLarge"
+            android:textStyle="bold"
+            android:textColor="?attr/colorPrimary"
+            tools:text="$12.900" />
+
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardAllergenAlert"
             android:layout_width="wrap_content"

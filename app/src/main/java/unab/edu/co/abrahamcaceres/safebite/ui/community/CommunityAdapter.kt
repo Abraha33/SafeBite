@@ -38,6 +38,7 @@ class CommunityAdapter(
             binding.textProductName.text = sighting.getProductName()
             binding.textCommunityTip.text = sighting.getCommunityTip()
             binding.textStoreLocation.text = sighting.getStoreName()
+            binding.textPrice.text = sighting.getPrice()
 
             val tag = sighting.getAllergenTag()
             val isSafe = tag.contains("Free", ignoreCase = true) ||
