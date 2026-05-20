@@ -85,6 +85,11 @@ class CommunityFragment : Fragment() {
     }
 
     private fun onItemClick(sighting: Sighting) {
+        val bundle = Bundle().apply {
+            putFloat("latitude", sighting.getLatitude().toFloat())
+            putFloat("longitude", sighting.getLongitude().toFloat())
+        }
+        findNavController().navigate(R.id.action_community_to_map, bundle)
     }
 
     override fun onDestroyView() {

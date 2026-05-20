@@ -54,7 +54,9 @@ class CommunityViewModel(
                 price = "$12.900",
                 communityTip = "Precio especial por mayoreo. Perfecta para repostería libre de gluten.",
                 targetCity = "Bucaramanga",
-                allergenTag = "Gluten-Free"
+                allergenTag = "Gluten-Free",
+                latitude = 7.1254,
+                longitude = -73.1198
             ),
             Sighting.crear(
                 creatorName = "Carlos Ruiz",
@@ -64,7 +66,9 @@ class CommunityViewModel(
                 price = "$8.500",
                 communityTip = "Leche vegetal fortificada con calcio. Ideal para intolerantes a lactosa pero contiene soya.",
                 targetCity = "Piedecuesta",
-                allergenTag = "Contiene Soja"
+                allergenTag = "Contiene Soja",
+                latitude = 6.9896,
+                longitude = -73.0536
             ),
             Sighting.crear(
                 creatorName = "Laura Medina",
@@ -74,7 +78,9 @@ class CommunityViewModel(
                 price = "$6.200",
                 communityTip = "Sección saludable. Etiqueta sin azúcar pero advierten trazas de trigo.",
                 targetCity = "Bucaramanga",
-                allergenTag = "Trazas de Gluten"
+                allergenTag = "Trazas de Gluten",
+                latitude = 7.1186,
+                longitude = -73.1161
             ),
             Sighting.crear(
                 creatorName = "Pedro Sánchez",
@@ -84,7 +90,9 @@ class CommunityViewModel(
                 price = "$15.000",
                 communityTip = "Producto artesanal. Libre de lácteos, gluten y soya.",
                 targetCity = "Floridablanca",
-                allergenTag = "Lactose-Free"
+                allergenTag = "Lactose-Free",
+                latitude = 7.0648,
+                longitude = -73.0894
             ),
             Sighting.crear(
                 creatorName = "Ana López",
@@ -94,7 +102,9 @@ class CommunityViewModel(
                 price = "$4.500",
                 communityTip = "Tiene maní como segundo ingrediente. No apta para alérgicos.",
                 targetCity = "Girón",
-                allergenTag = "Contiene Maní"
+                allergenTag = "Contiene Maní",
+                latitude = 7.0682,
+                longitude = -73.1697
             ),
             Sighting.crear(
                 creatorName = "Sofía Torres",
@@ -104,7 +114,9 @@ class CommunityViewModel(
                 price = "$10.200",
                 communityTip = "Certificado libre de gluten, apto celíacos.",
                 targetCity = "Bucaramanga",
-                allergenTag = "Gluten-Free"
+                allergenTag = "Gluten-Free",
+                latitude = 7.1295,
+                longitude = -73.1227
             )
         )
         samples.forEach { repository.insert(it) }

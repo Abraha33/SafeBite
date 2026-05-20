@@ -24,7 +24,11 @@ class Sighting(
     @ColumnInfo(name = "target_city")
     private var targetCity: String = "",
     @ColumnInfo(name = "allergen_tag")
-    private var allergenTag: String = ""
+    private var allergenTag: String = "",
+    @ColumnInfo(name = "latitude")
+    private var latitude: Double = 0.0,
+    @ColumnInfo(name = "longitude")
+    private var longitude: Double = 0.0
 ) {
 
     fun getId(): Long = id
@@ -36,6 +40,8 @@ class Sighting(
     fun getCommunityTip(): String = communityTip
     fun getTargetCity(): String = targetCity
     fun getAllergenTag(): String = allergenTag
+    fun getLatitude(): Double = latitude
+    fun getLongitude(): Double = longitude
 
     companion object {
         fun crear(
@@ -46,7 +52,9 @@ class Sighting(
             price: String = "",
             communityTip: String,
             targetCity: String,
-            allergenTag: String
+            allergenTag: String,
+            latitude: Double = 0.0,
+            longitude: Double = 0.0
         ): Sighting {
             return Sighting(
                 id = 0L,
@@ -57,7 +65,9 @@ class Sighting(
                 price = price.trim(),
                 communityTip = communityTip.trim(),
                 targetCity = targetCity.trim(),
-                allergenTag = allergenTag.trim()
+                allergenTag = allergenTag.trim(),
+                latitude = latitude,
+                longitude = longitude
             )
         }
     }

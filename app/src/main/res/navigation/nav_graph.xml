@@ -50,6 +50,22 @@
         <action
             android:id="@+id/action_community_to_add_sighting"
             app:destination="@id/addSightingFragment" />
+        <action
+            android:id="@+id/action_community_to_map"
+            app:destination="@id/mapSightingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/mapSightingFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.community.MapSightingFragment"
+        android:label="@string/map_title"
+        tools:layout="@layout/fragment_map_sighting">
+        <argument
+            android:name="latitude"
+            app:argType="float" />
+        <argument
+            android:name="longitude"
+            app:argType="float" />
     </fragment>
 
     <fragment

@@ -12,7 +12,7 @@ import unab.edu.co.abrahamcaceres.safebite.model.User
  */
 @Database(
     entities = [User::class, Allergen::class, ProductScan::class, Sighting::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 abstract class SafeBiteDatabase : RoomDatabase() {

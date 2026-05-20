@@ -153,6 +153,9 @@
     <string name="add_sighting_chip_peanut">Sin Maní</string>
     <string name="add_sighting_chip_sugar">Sin Azúcar</string>
 
+    <!-- Map -->
+    <string name="map_title">Ubicación del Avistamiento</string>
+
     <string-array name="cities">
         <item>Todas las ciudades</item>
         <item>Bucaramanga</item>
