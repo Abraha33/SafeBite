@@ -79,8 +79,19 @@ class RegisterFragment : Fragment() {
             val name = binding.inputName.text?.toString().orEmpty()
             val email = binding.inputEmail.text?.toString().orEmpty()
             val password = binding.inputPassword.text?.toString().orEmpty()
-            viewModel.validateAndRegister(name, email, password)
+            val allergens = getSelectedAllergens()
+            viewModel.validateAndRegister(name, email, password, city = "Bucaramanga", allergens = allergens)
         }
+    }
+
+    private fun getSelectedAllergens(): List<String> {
+        val checkedIds = binding.chipGroupDiet.checkedChipIds
+        val labels = mutableListOf<String>()
+        for (id in checkedIds) {
+            val chip = binding.root.findViewById<com.google.android.material.chip.Chip>(id)
+            chip?.let { labels.add(it.text.toString()) }
+        }
+        return labels
     }
 
     private fun setError(layout: TextInputLayout, message: String?) {

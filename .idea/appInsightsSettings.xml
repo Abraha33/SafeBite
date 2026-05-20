@@ -9,9 +9,9 @@
               <option name="connection">
                 <ConnectionSetting>
                   <option name="appId" value="unab.edu.co.abrahamcaceres.safebite" />
-                  <option name="mobileSdkAppId" value="1:494097332081:android:fdbc76647ef0166d0e28d0" />
-                  <option name="projectId" value="safebite-72133" />
-                  <option name="projectNumber" value="494097332081" />
+                  <option name="mobileSdkAppId" value="1:000000000000:android:0000000000000000" />
+                  <option name="projectId" value="safebite-placeholder" />
+                  <option name="projectNumber" value="000000000000" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />

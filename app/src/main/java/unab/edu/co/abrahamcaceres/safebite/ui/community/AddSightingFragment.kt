@@ -8,24 +8,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import kotlinx.coroutines.launch
 import unab.edu.co.abrahamcaceres.safebite.R
+import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentAddSightingBinding
-import unab.edu.co.abrahamcaceres.safebite.model.Sighting
 import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
-import unab.edu.co.abrahamcaceres.safebite.viewmodel.CommunityViewModel
-import unab.edu.co.abrahamcaceres.safebite.viewmodel.CommunityViewModelFactory
 
 class AddSightingFragment : Fragment() {
 
     private var _binding: FragmentAddSightingBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: CommunityViewModel by viewModels {
-        CommunityViewModelFactory(requireActivity().application)
-    }
+    private val firestoreRepo = FirebaseFirestoreRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,7 +76,7 @@ class AddSightingFragment : Fragment() {
     private fun publishSighting() {
         val productName = binding.etProductName.text?.toString().orEmpty().trim()
         val storeName = binding.etStoreName.text?.toString().orEmpty().trim()
-        val price = binding.etPrice.text?.toString().orEmpty().trim()
+        val priceStr = binding.etPrice.text?.toString().orEmpty().trim()
         val communityTip = binding.etCommunityTip.text?.toString().orEmpty().trim()
 
         val allergenTag = when (binding.chipGroupAllergenTag.checkedChipId) {
@@ -90,18 +88,25 @@ class AddSightingFragment : Fragment() {
             else -> ""
         }
 
-        val sighting = Sighting.crear(
-            creatorName = "Tú",
-            timeAgo = "Justo ahora",
-            productName = productName,
-            storeName = storeName,
-            price = if (price.isNotBlank()) "$$price" else "",
-            communityTip = communityTip,
-            targetCity = "Bucaramanga",
-            allergenTag = allergenTag
-        )
+        val price = priceStr.toDoubleOrNull() ?: 0.0
 
-        viewModel.publishSighting(sighting)
+        lifecycleScope.launch {
+            val result = firestoreRepo.uploadCommunitySighting(
+                productName = productName,
+                storeName = storeName,
+                price = price,
+                tip = communityTip,
+                allergenTag = allergenTag
+            )
+            result.fold(
+                onSuccess = {
+                    Toast.makeText(requireContext(), R.string.add_sighting_publish_ok, Toast.LENGTH_SHORT).show()
+                },
+                onFailure = { e ->
+                    Toast.makeText(requireContext(), e.message ?: "Error", Toast.LENGTH_SHORT).show()
+                }
+            )
+        }
 
         clearFields()
         hideKeyboard()

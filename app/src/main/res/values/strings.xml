@@ -147,6 +147,7 @@
     <string name="add_sighting_tip_hint">Tip o Consejo para la Comunidad</string>
     <string name="add_sighting_allergen_label">Etiqueta de Salud</string>
     <string name="add_sighting_publish">Publicar en Muro Social</string>
+    <string name="add_sighting_publish_ok">Avistamiento publicado en la nube</string>
     <string name="add_sighting_chip_gluten">Sin Gluten</string>
     <string name="add_sighting_chip_lactose">Sin Lactosa</string>
     <string name="add_sighting_chip_vegan">Vegano</string>

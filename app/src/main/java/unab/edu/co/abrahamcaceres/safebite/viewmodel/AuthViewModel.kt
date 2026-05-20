@@ -5,19 +5,21 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import unab.edu.co.abrahamcaceres.safebite.R
-import unab.edu.co.abrahamcaceres.safebite.data.repository.UserRepository
-import unab.edu.co.abrahamcaceres.safebite.model.User
+import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
 import unab.edu.co.abrahamcaceres.safebite.utils.SessionManager
 
-/**
- * LÃ³gica de negocio MVVM para Login y Registro (validaciÃ³n + acceso a Room vÃ­a repositorio).
- */
 class AuthViewModel(
     application: Application,
-    private val repository: UserRepository
+    private val firebaseAuth: FirebaseAuth,
+    private val firestoreRepo: FirebaseFirestoreRepository
 ) : AndroidViewModel(application) {
 
     private val appContext: Application = application
@@ -38,70 +40,59 @@ class AuthViewModel(
     private val _loginSuccess = MutableLiveData(false)
     val loginSuccess: LiveData<Boolean> = _loginSuccess
 
-    /** Reinicia el evento de registro exitoso para evitar navegaciones duplicadas al rotar. */
     fun consumeRegisterSuccess() {
         _registerSuccess.value = false
     }
 
-    /** Reinicia el evento de login exitoso. */
     fun consumeLoginSuccess() {
         _loginSuccess.value = false
     }
 
-    /**
-     * Valida campos y, si todo es correcto, persiste el usuario en Room.
-     */
-    fun validateAndRegister(name: String, email: String, password: String) {
+    fun validateAndRegister(
+        name: String,
+        email: String,
+        password: String,
+        city: String = "Bucaramanga",
+        allergens: List<String> = emptyList()
+    ) {
         if (!validateRegisterFields(name, email, password)) return
 
         viewModelScope.launch {
-            val user = User.desdeRegistro(
-                nombreCompleto = name,
-                correo = email,
-                contrasenaPlano = password
-            )
-            val result = repository.register(user)
-            result.fold(
-                onSuccess = { _registerSuccess.postValue(true) },
-                onFailure = { error ->
-                    when (error.message) {
-                        UserRepository.CODE_EMAIL_EXISTS ->
-                            _emailError.postValue(appContext.getString(R.string.error_email_registered))
+            try {
+                val authResult = firebaseAuth.createUserWithEmailAndPassword(email, password).await()
+                val uid = authResult.user?.uid
+                    ?: throw IllegalStateException("AUTH_FAILED")
 
-                        else ->
-                            _emailError.postValue(appContext.getString(R.string.error_unknown))
-                    }
-                }
-            )
+                firestoreRepo.saveUserProfile(uid, name, email, city, allergens).fold(
+                    onSuccess = { _registerSuccess.postValue(true) },
+                    onFailure = { _emailError.postValue(appContext.getString(R.string.error_unknown)) }
+                )
+            } catch (e: FirebaseAuthUserCollisionException) {
+                _emailError.postValue(appContext.getString(R.string.error_email_registered))
+            } catch (e: FirebaseAuthWeakPasswordException) {
+                _passwordError.postValue(appContext.getString(R.string.error_password_short))
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _emailError.postValue(appContext.getString(R.string.error_email_invalid))
+            } catch (e: Exception) {
+                _emailError.postValue(appContext.getString(R.string.error_unknown))
+            }
         }
     }
 
-    /**
-     * Valida credenciales y consulta Room para iniciar sesiÃ³n local.
-     */
     fun validateAndLogin(email: String, password: String) {
         if (!validateLoginFields(email, password)) return
 
         viewModelScope.launch {
-            val result = repository.login(email, password)
-            result.fold(
-                onSuccess = { user ->
-                    sessionManager.saveCurrentUserEmail(user.getEmail())
-                    _loginSuccess.postValue(true)
-                },
-                onFailure = { error ->
-                    when (error.message) {
-                        UserRepository.CODE_USER_NOT_FOUND ->
-                            _emailError.postValue(appContext.getString(R.string.error_user_not_found))
-
-                        UserRepository.CODE_BAD_PASSWORD ->
-                            _passwordError.postValue(appContext.getString(R.string.error_bad_password))
-
-                        else ->
-                            _emailError.postValue(appContext.getString(R.string.error_unknown))
-                    }
-                }
-            )
+            try {
+                firebaseAuth.signInWithEmailAndPassword(email, password).await()
+                sessionManager.saveCurrentUserEmail(email)
+                _loginSuccess.postValue(true)
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                _emailError.postValue(appContext.getString(R.string.error_user_not_found))
+                _passwordError.postValue(appContext.getString(R.string.error_bad_password))
+            } catch (e: Exception) {
+                _emailError.postValue(appContext.getString(R.string.error_unknown))
+            }
         }
     }
 
@@ -114,7 +105,6 @@ class AuthViewModel(
                 _nameError.value = appContext.getString(R.string.error_required)
                 valid = false
             }
-
             !InputValidators.isValidName(name) -> {
                 _nameError.value = appContext.getString(R.string.error_name_short)
                 valid = false
@@ -126,7 +116,6 @@ class AuthViewModel(
                 _emailError.value = appContext.getString(R.string.error_required)
                 valid = false
             }
-
             !InputValidators.isValidEmail(email) -> {
                 _emailError.value = appContext.getString(R.string.error_email_invalid)
                 valid = false
@@ -138,7 +127,6 @@ class AuthViewModel(
                 _passwordError.value = appContext.getString(R.string.error_required)
                 valid = false
             }
-
             !InputValidators.isValidPassword(password) -> {
                 _passwordError.value = appContext.getString(R.string.error_password_short)
                 valid = false
@@ -157,7 +145,6 @@ class AuthViewModel(
                 _emailError.value = appContext.getString(R.string.error_required)
                 valid = false
             }
-
             !InputValidators.isValidEmail(email) -> {
                 _emailError.value = appContext.getString(R.string.error_email_invalid)
                 valid = false
@@ -169,7 +156,6 @@ class AuthViewModel(
                 _passwordError.value = appContext.getString(R.string.error_required)
                 valid = false
             }
-
             !InputValidators.isValidPassword(password) -> {
                 _passwordError.value = appContext.getString(R.string.error_password_short)
                 valid = false
