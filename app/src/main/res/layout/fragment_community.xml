@@ -15,8 +15,9 @@
         app:title="@string/community_title">
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:clickable="true"
@@ -40,6 +41,15 @@
                 android:contentDescription="@string/community_city_selector_cd"
                 app:tint="?attr/colorOnSurface" />
         </LinearLayout>
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_search"
+            android:contentDescription="@string/search_cd"
+            android:padding="8dp"
+            app:tint="?attr/colorOnSurfaceVariant"
+            android:background="?attr/selectableItemBackgroundBorderless" />
     </com.google.android.material.appbar.MaterialToolbar>
 
     <androidx.recyclerview.widget.RecyclerView

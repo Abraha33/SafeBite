@@ -67,15 +67,6 @@
             android:textStyle="bold"
             tools:text="Harina de Almendras" />
 
-        <TextView
-            android:id="@+id/textStoreName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textAppearance="?attr/textAppearanceBodySmall"
-            android:textColor="?attr/colorOnSurfaceVariant"
-            tools:text="Store v. Bucaramanga" />
-
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardAllergenAlert"
             android:layout_width="wrap_content"
@@ -90,20 +81,21 @@
                 android:id="@+id/textAllergenTag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingLeft="12dp"
-                android:paddingRight="12dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="6dp"
+                android:paddingLeft="14dp"
+                android:paddingRight="14dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
                 android:textColor="@android:color/white"
                 android:textAppearance="?attr/textAppearanceLabelMedium"
-                tools:text="Gluten-Free" />
+                android:textStyle="bold"
+                tools:text="✓ 100% Seguro para tu Perfil" />
         </com.google.android.material.card.MaterialCardView>
 
         <TextView
             android:id="@+id/textCommunityTip"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="12dp"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             android:lineSpacingExtra="4dp"
             tools:text="Precio especial por mayoreo. Perfecta para repostería libre de gluten." />
@@ -111,7 +103,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="10dp"
+            android:layout_marginVertical="12dp"
             android:background="?attr/colorOutlineVariant"
             android:alpha="0.4" />
 
@@ -128,13 +120,13 @@
                 android:contentDescription="@string/community_pin_cd" />
 
             <TextView
-                android:id="@+id/textTargetCity"
+                android:id="@+id/textStoreLocation"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="6dp"
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 android:textColor="?attr/colorOnSurfaceVariant"
-                tools:text="Bucaramanga" />
+                tools:text="Éxito Cabecera" />
         </LinearLayout>
     </LinearLayout>
 

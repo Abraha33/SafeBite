@@ -31,32 +31,30 @@ class CommunityAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(sighting: Sighting) {
+            val ctx = binding.root.context
+
             binding.textCreatorName.text = sighting.getCreatorName()
             binding.textTimeAgo.text = sighting.getTimeAgo()
             binding.textProductName.text = sighting.getProductName()
-            binding.textStoreName.text = sighting.getStoreName()
             binding.textCommunityTip.text = sighting.getCommunityTip()
-            binding.textTargetCity.text = sighting.getTargetCity()
-            binding.textAllergenTag.text = sighting.getAllergenTag()
+            binding.textStoreLocation.text = sighting.getStoreName()
 
-            bindAllergenColors(sighting)
-
-            binding.root.setOnClickListener { onItemClick(sighting) }
-        }
-
-        private fun bindAllergenColors(sighting: Sighting) {
-            val ctx = binding.root.context
             val tag = sighting.getAllergenTag()
             val isSafe = tag.contains("Free", ignoreCase = true) ||
                 tag.contains("Seguro", ignoreCase = true)
+
+            binding.textAllergenTag.text = if (isSafe) {
+                ctx.getString(R.string.community_allergen_safe)
+            } else {
+                ctx.getString(R.string.community_allergen_alert, tag)
+            }
 
             val bgRes = if (isSafe) R.color.risk_safe_on else R.color.risk_danger_on
             binding.cardAllergenAlert.setCardBackgroundColor(
                 ContextCompat.getColor(ctx, bgRes)
             )
-            binding.textAllergenTag.setTextColor(
-                ContextCompat.getColor(ctx, android.R.color.white)
-            )
+
+            binding.root.setOnClickListener { onItemClick(sighting) }
         }
     }
 
@@ -68,6 +66,6 @@ class CommunityAdapter(
             oldItem.getProductName() == newItem.getProductName() &&
                 oldItem.getCommunityTip() == newItem.getCommunityTip() &&
                 oldItem.getAllergenTag() == newItem.getAllergenTag() &&
-                oldItem.getTimeAgo() == newItem.getTimeAgo()
+                oldItem.getStoreName() == newItem.getStoreName()
     }
 }

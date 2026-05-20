@@ -128,12 +128,15 @@
     <string name="community_title">Comunidad</string>
     <string name="community_default_city">Bucaramanga</string>
     <string name="community_city_selector_cd">Seleccionar ciudad</string>
-    <string name="community_empty">No hay publicaciones en esta ciudad. ¡Sé el primero en compartir un tip!</string>
+    <string name="community_empty">No hay publicaciones en esta ciudad. ¡Sé el primero en publicar una receta!</string>
     <string name="community_empty_cd">Feed vacío</string>
-    <string name="community_fab_text">+ Compartir Tip</string>
-    <string name="community_fab_cd">Publicar un tip en la comunidad</string>
+    <string name="community_fab_text">+ Publicar Receta</string>
+    <string name="community_fab_cd">Publicar una receta en la comunidad</string>
     <string name="community_pin_cd">Ubicación</string>
     <string name="community_city_dialog_title">Seleccionar ciudad</string>
+    <string name="community_allergen_safe">✓ 100% Seguro para tu Perfil</string>
+    <string name="community_allergen_alert">⚠️ Alerta: Contiene %1$s</string>
+    <string name="search_cd">Buscar</string>
 
     <string-array name="cities">
         <item>Todas las ciudades</item>
