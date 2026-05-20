@@ -71,7 +71,7 @@ class AuthViewModel(
                     city = city,
                     allergens = allergens
                 )
-                firestoreRepo.saveUserProfile(profile).fold(
+                firestoreRepo.createUserProfile(profile).fold(
                     onSuccess = { _registerSuccess.postValue(true) },
                     onFailure = { _emailError.postValue(appContext.getString(R.string.error_unknown)) }
                 )

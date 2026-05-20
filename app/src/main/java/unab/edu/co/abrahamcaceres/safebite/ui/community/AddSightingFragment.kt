@@ -10,21 +10,24 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import kotlinx.coroutines.launch
+import com.google.firebase.auth.FirebaseAuth
 import unab.edu.co.abrahamcaceres.safebite.R
-import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentAddSightingBinding
 import unab.edu.co.abrahamcaceres.safebite.model.cloud.SightingCloudModel
 import unab.edu.co.abrahamcaceres.safebite.utils.InputValidators
+import unab.edu.co.abrahamcaceres.safebite.viewmodel.CommunityViewModel
+import unab.edu.co.abrahamcaceres.safebite.viewmodel.CommunityViewModelFactory
 
 class AddSightingFragment : Fragment() {
 
     private var _binding: FragmentAddSightingBinding? = null
     private val binding get() = _binding!!
 
-    private val firestoreRepo = FirebaseFirestoreRepository()
+    private val viewModel: CommunityViewModel by viewModels {
+        CommunityViewModelFactory(requireActivity().application)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,6 +44,7 @@ class AddSightingFragment : Fragment() {
         setupToolbar()
         setupTextWatchers()
         setupPublishButton()
+        observePublishResult()
     }
 
     private fun setupToolbar() {
@@ -65,12 +69,37 @@ class AddSightingFragment : Fragment() {
         val product = binding.etProductName.text?.toString().orEmpty()
         val store = binding.etStoreName.text?.toString().orEmpty()
         val valid = InputValidators.isNotBlank(product) && InputValidators.isNotBlank(store)
-        binding.btnPublishSighting.isEnabled = valid
+        if (viewModel.isPublishing.value != true) {
+            binding.btnPublishSighting.isEnabled = valid
+        }
     }
 
     private fun setupPublishButton() {
         binding.btnPublishSighting.setOnClickListener {
             publishSighting()
+        }
+    }
+
+    private fun observePublishResult() {
+        viewModel.publishResult.observe(viewLifecycleOwner) { result ->
+            if (result == null) return@observe
+            if (result) {
+                Toast.makeText(requireContext(), R.string.add_sighting_publish_ok, Toast.LENGTH_SHORT).show()
+                clearFields()
+                hideKeyboard()
+                findNavController().popBackStack()
+            } else {
+                Toast.makeText(requireContext(), R.string.error_unknown, Toast.LENGTH_SHORT).show()
+            }
+            viewModel.consumePublishResult()
+        }
+        viewModel.isPublishing.observe(viewLifecycleOwner) { publishing ->
+            binding.btnPublishSighting.isEnabled = !publishing
+            binding.btnPublishSighting.text = if (publishing) {
+                getString(R.string.add_sighting_publishing)
+            } else {
+                getString(R.string.add_sighting_publish)
+            }
         }
     }
 
@@ -90,28 +119,19 @@ class AddSightingFragment : Fragment() {
         }
 
         val price = priceStr.toDoubleOrNull() ?: 0.0
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
-        lifecycleScope.launch {
-            val sighting = SightingCloudModel(
-                productName = productName,
-                storeName = storeName,
-                price = price,
-                communityTip = communityTip,
-                allergenTag = allergenTag
-            )
-            val result = firestoreRepo.uploadCommunitySighting(sighting)
-            result.fold(
-                onSuccess = {
-                    Toast.makeText(requireContext(), R.string.add_sighting_publish_ok, Toast.LENGTH_SHORT).show()
-                    clearFields()
-                    hideKeyboard()
-                    findNavController().popBackStack()
-                },
-                onFailure = { e ->
-                    Toast.makeText(requireContext(), e.message ?: "Error", Toast.LENGTH_SHORT).show()
-                }
-            )
-        }
+        val sighting = SightingCloudModel(
+            creatorUid = uid,
+            creatorName = "",
+            productName = productName,
+            storeName = storeName,
+            price = price,
+            communityTip = communityTip,
+            allergenTag = allergenTag,
+            targetCity = "Bucaramanga"
+        )
+        viewModel.publishSighting(sighting)
     }
 
     private fun clearFields() {

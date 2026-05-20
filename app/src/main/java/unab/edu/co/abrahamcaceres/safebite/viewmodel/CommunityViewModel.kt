@@ -4,121 +4,107 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
-import unab.edu.co.abrahamcaceres.safebite.data.repository.SightingRepository
+import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.model.Sighting
+import unab.edu.co.abrahamcaceres.safebite.model.cloud.SightingCloudModel
+import java.text.NumberFormat
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
 class CommunityViewModel(
     application: Application,
-    private val repository: SightingRepository
+    private val firestoreRepo: FirebaseFirestoreRepository
 ) : AndroidViewModel(application) {
 
-    private val _selectedCity = MutableLiveData<String>("")
+    private val _sightings = MutableLiveData<List<Sighting>>(emptyList())
+    val sightings: LiveData<List<Sighting>> = _sightings
 
-    val sightings: LiveData<List<Sighting>> = _selectedCity.switchMap { city ->
-        if (city.isBlank()) repository.observeAll()
-        else repository.observeByCity(city)
-    }
-
+    private val _selectedCity = MutableLiveData("")
     val selectedCity: LiveData<String> = _selectedCity
+
+    private val _isLoading = MutableLiveData(false)
+    val isLoading: LiveData<Boolean> = _isLoading
+
+    private val _isPublishing = MutableLiveData(false)
+    val isPublishing: LiveData<Boolean> = _isPublishing
+
+    private val _publishResult = MutableLiveData<Boolean?>(null)
+    val publishResult: LiveData<Boolean?> = _publishResult
+
+    init {
+        fetchSightings("")
+    }
 
     fun filterByCity(city: String) {
         _selectedCity.value = city
+        fetchSightings(city)
     }
 
-    fun publishSighting(sighting: Sighting) {
-        if (sighting.getProductName().isBlank()) return
+    fun publishSighting(sighting: SightingCloudModel) {
+        if (_isPublishing.value == true) return
         viewModelScope.launch {
-            repository.insert(sighting)
+            _isPublishing.value = true
+            firestoreRepo.postSighting(sighting).fold(
+                onSuccess = { _publishResult.value = true },
+                onFailure = { _publishResult.value = false }
+            )
+            _isPublishing.value = false
         }
     }
 
-    fun seedIfEmpty() {
+    fun consumePublishResult() {
+        _publishResult.value = null
+    }
+
+    private fun fetchSightings(city: String) {
         viewModelScope.launch {
-            val count = repository.count()
-            if (count == 0) {
-                seedSampleData()
+            _isLoading.value = true
+            val result = firestoreRepo.fetchSightings(city = city)
+            result.fold(
+                onSuccess = { cloudList ->
+                    _sightings.value = cloudList.map { it.toSighting() }
+                },
+                onFailure = { _sightings.value = emptyList() }
+            )
+            _isLoading.value = false
+        }
+    }
+
+    private companion object {
+        fun SightingCloudModel.toSighting(): Sighting {
+            val fmt = NumberFormat.getCurrencyInstance(Locale("es", "CO"))
+            fmt.maximumFractionDigits = 0
+            return Sighting.crear(
+                creatorName = creatorName.ifBlank { "Anónimo" },
+                timeAgo = formatRelativeTime(createdAt),
+                productName = productName,
+                storeName = storeName,
+                price = fmt.format(price),
+                communityTip = communityTip,
+                targetCity = targetCity,
+                allergenTag = allergenTag,
+                latitude = latitude,
+                longitude = longitude
+            )
+        }
+
+        fun formatRelativeTime(timestamp: Long): String {
+            val now = System.currentTimeMillis()
+            val diff = now - timestamp
+            val minutes = TimeUnit.MILLISECONDS.toMinutes(diff)
+            val hours = TimeUnit.MILLISECONDS.toHours(diff)
+            val days = TimeUnit.MILLISECONDS.toDays(diff)
+            return when {
+                minutes < 1 -> "Justo ahora"
+                minutes < 60 -> "Hace $minutes min"
+                hours < 24 -> "Hace $hours h"
+                days == 1L -> "Hace 1 día"
+                days < 7 -> "Hace $days días"
+                days < 30 -> "Hace ${days / 7} sem"
+                else -> "Hace ${days / 30} meses"
             }
         }
-    }
-
-    private suspend fun seedSampleData() {
-        val samples = listOf(
-            Sighting.crear(
-                creatorName = "Chef María",
-                timeAgo = "Hace 16 horas",
-                productName = "Harina de Almendras",
-                storeName = "Store v. Bucaramanga",
-                price = "$12.900",
-                communityTip = "Precio especial por mayoreo. Perfecta para repostería libre de gluten.",
-                targetCity = "Bucaramanga",
-                allergenTag = "Gluten-Free",
-                latitude = 7.1254,
-                longitude = -73.1198
-            ),
-            Sighting.crear(
-                creatorName = "Carlos Ruiz",
-                timeAgo = "Hace 2 días",
-                productName = "Leche de Soya NutriVeg",
-                storeName = "Supermercado Los Andes",
-                price = "$8.500",
-                communityTip = "Leche vegetal fortificada con calcio. Ideal para intolerantes a lactosa pero contiene soya.",
-                targetCity = "Piedecuesta",
-                allergenTag = "Contiene Soja",
-                latitude = 6.9896,
-                longitude = -73.0536
-            ),
-            Sighting.crear(
-                creatorName = "Laura Medina",
-                timeAgo = "Hace 3 días",
-                productName = "Galletas de Avena sin Azúcar",
-                storeName = "Éxito v. Bucaramanga",
-                price = "$6.200",
-                communityTip = "Sección saludable. Etiqueta sin azúcar pero advierten trazas de trigo.",
-                targetCity = "Bucaramanga",
-                allergenTag = "Trazas de Gluten",
-                latitude = 7.1186,
-                longitude = -73.1161
-            ),
-            Sighting.crear(
-                creatorName = "Pedro Sánchez",
-                timeAgo = "Hace 5 días",
-                productName = "Queso Vegano de Castañas",
-                storeName = "Feria Orgánica Floridablanca",
-                price = "$15.000",
-                communityTip = "Producto artesanal. Libre de lácteos, gluten y soya.",
-                targetCity = "Floridablanca",
-                allergenTag = "Lactose-Free",
-                latitude = 7.0648,
-                longitude = -73.0894
-            ),
-            Sighting.crear(
-                creatorName = "Ana López",
-                timeAgo = "Hace 1 semana",
-                productName = "Barra Energética EnergyGo",
-                storeName = "SportLife v. Girón",
-                price = "$4.500",
-                communityTip = "Tiene maní como segundo ingrediente. No apta para alérgicos.",
-                targetCity = "Girón",
-                allergenTag = "Contiene Maní",
-                latitude = 7.0682,
-                longitude = -73.1697
-            ),
-            Sighting.crear(
-                creatorName = "Sofía Torres",
-                timeAgo = "Hace 1 semana",
-                productName = "Pan Integral Sin TACC",
-                storeName = "Nature's v. Bucaramanga",
-                price = "$10.200",
-                communityTip = "Certificado libre de gluten, apto celíacos.",
-                targetCity = "Bucaramanga",
-                allergenTag = "Gluten-Free",
-                latitude = 7.1295,
-                longitude = -73.1227
-            )
-        )
-        samples.forEach { repository.insert(it) }
     }
 }

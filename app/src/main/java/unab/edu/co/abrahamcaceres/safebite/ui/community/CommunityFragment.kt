@@ -46,8 +46,6 @@ class CommunityFragment : Fragment() {
         setupCitySelector()
         setupFab()
 
-        viewModel.seedIfEmpty()
-
         viewModel.sightings.observe(viewLifecycleOwner) { list ->
             adapter.submitList(list)
             val empty = list.isNullOrEmpty()
