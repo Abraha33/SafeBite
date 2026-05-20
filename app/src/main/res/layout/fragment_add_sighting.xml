@@ -27,7 +27,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="20dp">
+            android:padding="16dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/inputProductName"
@@ -114,7 +114,7 @@
                 android:id="@+id/labelAllergenTag"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="24dp"
                 android:text="@string/add_sighting_allergen_label"
                 android:textAppearance="?attr/textAppearanceTitleSmall"
                 android:textStyle="bold"
@@ -126,7 +126,7 @@
                 android:id="@+id/chipGroupAllergenTag"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="8dp"
                 app:singleSelection="true"
                 app:selectionRequired="false"
                 app:chipSpacingHorizontal="8dp"
@@ -180,7 +180,7 @@
                 android:id="@+id/btnPublishSighting"
                 android:layout_width="0dp"
                 android:layout_height="60dp"
-                android:layout_marginTop="28dp"
+                android:layout_marginTop="32dp"
                 android:enabled="false"
                 android:text="@string/add_sighting_publish"
                 android:textAppearance="?attr/textAppearanceTitleMedium"
