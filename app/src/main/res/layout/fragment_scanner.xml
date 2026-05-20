@@ -3,9 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/scannerRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
+    android:fitsSystemWindows="false"
     tools:context=".ui.auth.ScannerFragment">
 
     <androidx.camera.view.PreviewView
@@ -18,7 +20,9 @@
         android:id="@+id/hudStatusCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:transitionName="hudCard"
         app:cardCornerRadius="16dp"
         app:cardElevation="6dp"
@@ -87,7 +91,7 @@
     <View
         android:id="@+id/bottomBarBackground"
         android:layout_width="match_parent"
-        android:layout_height="96dp"
+        android:layout_height="112dp"
         android:background="@color/scanner_bar_background"
         app:layout_constraintBottom_toBottomOf="parent" />
 

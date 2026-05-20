@@ -1,0 +1,46 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ──────────────────────────────────────────────
+    //  Colección: users/{userId}
+    //  Cada documento se identifica por el UID del
+    //  usuario. Solo su propietario puede leerlo o
+    //  modificarlo.
+    // ──────────────────────────────────────────────
+    match /users/{userId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == userId;
+    }
+
+    // ──────────────────────────────────────────────
+    //  Colección: sightings/{document}
+    //  Muro comunitario de avistamientos.
+    //  - Lectura: cualquier usuario autenticado.
+    //  - Escritura (crear): cualquier usuario
+    //    autenticado. No se permite actualizar ni
+    //    borrar (solo inserciones).
+    // ──────────────────────────────────────────────
+    match /sightings/{document} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if false;
+    }
+
+    // ──────────────────────────────────────────────
+    //  Colección: product_scans/{scanId}
+    //  Historial privado de escaneos.
+    //  Cada documento lleva un campo "uid" que
+    //  referencia al propietario.
+    // ──────────────────────────────────────────────
+    match /product_scans/{scanId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid
+                         == resource.data.uid;
+      allow create: if request.auth != null
+                    && request.auth.uid
+                    == request.resource.data.uid;
+    }
+  }
+}

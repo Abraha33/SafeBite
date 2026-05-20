@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -40,9 +41,16 @@ class MapSightingFragment : Fragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupToolbar()
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.mapContainer) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    private fun setupToolbar() {
+        binding.toolbarMap.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
     }
 
     override fun onMapReady(googleMap: com.google.android.gms.maps.GoogleMap) {
