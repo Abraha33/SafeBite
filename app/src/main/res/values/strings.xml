@@ -118,6 +118,7 @@
     <string name="profile_edit_title">Editar Perfil</string>
     <string name="profile_edit_allergens_label">Selecciona tus alérgenos</string>
     <string name="profile_save_button">Guardar Cambios</string>
+    <string name="profile_saving">Guardando…</string>
     <string name="profile_cancel_button">Cancelar</string>
     <string name="profile_save_success">Perfil actualizado correctamente</string>
     <string name="profile_save_error">Error al guardar los cambios</string>
@@ -151,6 +152,10 @@
     <string name="risk_safe">Seguro</string>
     <string name="risk_warning">Precaución</string>
     <string name="risk_danger">Peligro</string>
+
+    <!-- Detalle del escaneo -->
+    <string name="detail_ingredients_title">Ingredientes Identificados</string>
+    <string name="detail_allergens_title">Mis Alérgenos Configurados</string>
 
     <!-- Scanner bottom bar -->
     <string name="scanner_gallery_cd">Abrir galería</string>

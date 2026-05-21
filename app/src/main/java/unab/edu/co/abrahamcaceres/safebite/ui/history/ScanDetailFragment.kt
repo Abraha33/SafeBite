@@ -9,11 +9,15 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.textview.MaterialTextView
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
 import unab.edu.co.abrahamcaceres.safebite.R
+import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScanDetailBinding
 import unab.edu.co.abrahamcaceres.safebite.model.ScanRisk
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
@@ -33,6 +37,8 @@ class ScanDetailFragment : Fragment() {
     private val viewModel: ScanHistoryViewModel by viewModels {
         ScanHistoryViewModelFactory(requireActivity().application)
     }
+
+    private val firestoreRepo = FirebaseFirestoreRepository()
 
     private val dateFormatter: DateTimeFormatter =
         DateTimeFormatter.ofPattern("d 'de' MMMM 'de' yyyy, HH:mm", Locale.forLanguageTag("es-ES"))
@@ -58,6 +64,8 @@ class ScanDetailFragment : Fragment() {
 
         binding.toolbarDetail.setupWithNavController(findNavController())
 
+        loadUserAllergens()
+
         val scanId = args.scanId
 
         viewModel.scans.observe(viewLifecycleOwner) { list ->
@@ -68,8 +76,28 @@ class ScanDetailFragment : Fragment() {
                 binding.textScanDate.text = dateFormatter.format(
                     Instant.ofEpochMilli(item.getCreatedAtMs())
                 )
-                binding.textRawOcr.text = rawText
                 parseAndDisplayIngredients(rawText)
+            }
+        }
+    }
+
+    private fun loadUserAllergens() {
+        val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        lifecycleScope.launch {
+            firestoreRepo.fetchUserProfile(uid).onSuccess { user ->
+                val allergens = user.allergens
+                if (allergens.isEmpty()) {
+                    binding.cardAllergensPanel.visibility = View.GONE
+                    return@launch
+                }
+                binding.layoutAllergensChecklist.removeAllViews()
+                for (allergen in allergens) {
+                    val row = layoutInflater.inflate(R.layout.item_allergen_check, null) as ViewGroup
+                    row.findViewById<MaterialTextView>(R.id.textAllergenName).text = allergen
+                    binding.layoutAllergensChecklist.addView(row)
+                }
+            }.onFailure {
+                binding.cardAllergensPanel.visibility = View.GONE
             }
         }
     }
@@ -91,8 +119,10 @@ class ScanDetailFragment : Fragment() {
                 .filter { it.isNotBlank() && it.length > 2 }
         }
 
-        binding.chipCount.text = "${ingredientList.size} ${getString(R.string.ingredients_processed)}"
-        binding.chipCount.visibility = View.VISIBLE
+        binding.chipIngredientCount.text = "${ingredientList.size} ${getString(R.string.ingredients_processed)}"
+        binding.chipIngredientCount.visibility = View.VISIBLE
+
+        binding.tvIngredientsList.text = "(${ingredientList.joinToString(", ")})"
 
         binding.layoutIngredientGrid.removeAllViews()
         val chunked = ingredientList.chunked(2)

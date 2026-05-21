@@ -103,52 +103,95 @@
                 android:layout_height="wrap_content"
                 android:layout_marginVertical="8dp" />
 
-            <com.google.android.material.card.MaterialCardView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                app:cardElevation="2dp"
-                app:strokeColor="?attr/colorOutlineVariant"
-                app:strokeWidth="1dp">
+                android:orientation="horizontal"
+                android:weightSum="2">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/history_detail_ingredients_label"
-                        android:textAppearance="?attr/textAppearanceLabelLarge" />
-
-                    <TextView
-                        android:id="@+id/textRawOcr"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="16dp"
-                        android:layout_marginBottom="16dp"
-                        android:lineSpacingMultiplier="1.2"
-                        android:textAppearance="?attr/textAppearanceBodyMedium"
-                        tools:text="Ingredientes: leche en polvo, maní, trigo (gluten), soya." />
-
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/chipCount"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="12dp"
-                        app:chipBackgroundColor="?attr/colorPrimaryContainer"
-                        app:chipStrokeWidth="0dp"
-                        tools:text="4 Ingredientes procesados" />
+                    android:layout_weight="1"
+                    android:layout_marginEnd="6dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="?attr/colorOutlineVariant"
+                    app:strokeWidth="1dp">
 
                     <LinearLayout
-                        android:id="@+id/layoutIngredientGrid"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/detail_ingredients_title"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvIngredientsList"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:lineSpacingMultiplier="1.2"
+                            android:textAppearance="?attr/textAppearanceBodySmall"
+                            tools:text="(leche en polvo, maní, trigo, soya)" />
+
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chipIngredientCount"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            app:chipBackgroundColor="@color/risk_safe_container"
+                            app:chipStrokeWidth="0dp"
+                            tools:text="4 Ingredientes procesados" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutIngredientGrid"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardAllergensPanel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="6dp"
+                    app:cardElevation="2dp"
+                    app:strokeColor="?attr/colorOutlineVariant"
+                    app:strokeWidth="1dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="@string/detail_allergens_title"
+                            android:textAppearance="?attr/textAppearanceLabelLarge"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:id="@+id/layoutAllergensChecklist"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:orientation="vertical" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

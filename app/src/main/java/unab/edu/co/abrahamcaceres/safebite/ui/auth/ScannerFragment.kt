@@ -515,16 +515,18 @@ class ScannerFragment : Fragment() {
     }
 
     private fun showTrackingIndicator() {
-        binding.scanOverlay.visibility = View.VISIBLE
-        binding.textTrackingStatus.apply {
+        val b = _binding ?: return
+        b.scanOverlay.visibility = View.VISIBLE
+        b.textTrackingStatus.apply {
             text = getString(R.string.tracking_label_found)
             visibility = View.VISIBLE
         }
     }
 
     private fun hideTrackingIndicator() {
-        binding.scanOverlay.visibility = View.GONE
-        binding.textTrackingStatus.visibility = View.GONE
+        val b = _binding ?: return
+        b.scanOverlay.visibility = View.GONE
+        b.textTrackingStatus.visibility = View.GONE
     }
 
     private fun resetStableCounter() {
@@ -533,14 +535,15 @@ class ScannerFragment : Fragment() {
     }
 
     private fun showDetectedChip(allergenText: String) {
-        binding.chipDetectedIngredient.apply {
+        val b = _binding ?: return
+        b.chipDetectedIngredient.apply {
             text = "\u26A0\uFE0F $allergenText"
             visibility = View.VISIBLE
         }
     }
 
     private fun hideDetectedChip() {
-        binding.chipDetectedIngredient.visibility = View.GONE
+        _binding?.chipDetectedIngredient?.visibility = View.GONE
     }
 
     private fun handleAnalysisError(error: Exception) {

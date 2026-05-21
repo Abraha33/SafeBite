@@ -26,7 +26,7 @@ class BlacklistFragment : Fragment() {
         BlacklistViewModelFactory(requireActivity().application)
     }
 
-    private val adapter = BlacklistAdapter(mutableListOf()) { product ->
+    private val adapter = BlacklistAdapter { product ->
         showRemoveConfirmation(product)
     }
 
@@ -56,7 +56,7 @@ class BlacklistFragment : Fragment() {
         binding.rvBlacklist.adapter = adapter
 
         viewModel.blacklist.observe(viewLifecycleOwner) { list ->
-            adapter.updateList(list)
+            adapter.submitList(list)
         }
 
         viewModel.isEmpty.observe(viewLifecycleOwner) { empty ->

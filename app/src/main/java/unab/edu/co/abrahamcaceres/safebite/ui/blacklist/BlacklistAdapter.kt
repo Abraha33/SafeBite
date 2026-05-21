@@ -3,6 +3,8 @@ package unab.edu.co.abrahamcaceres.safebite.ui.blacklist
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.ItemBlacklistBinding
@@ -13,31 +15,24 @@ import java.util.Date
 import java.util.Locale
 
 class BlacklistAdapter(
-    private val items: MutableList<ProductModel>,
     private val onRemove: (ProductModel) -> Unit
-) : RecyclerView.Adapter<BlacklistAdapter.ViewHolder>() {
+) : ListAdapter<ProductModel, BlacklistAdapter.ViewHolder>(DiffCallback) {
 
     private val dateFormat = SimpleDateFormat("d MMM yyyy, HH:mm", Locale.forLanguageTag("es-ES"))
 
-    fun updateList(newList: List<ProductModel>) {
-        items.clear()
-        items.addAll(newList)
-        notifyDataSetChanged()
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val binding = ItemBlacklistBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding)
+        return ViewHolder(binding, dateFormat, onRemove)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position])
+        holder.bind(getItem(position))
     }
 
-    override fun getItemCount() = items.size
-
-    inner class ViewHolder(
-        private val binding: ItemBlacklistBinding
+    class ViewHolder(
+        private val binding: ItemBlacklistBinding,
+        private val dateFormat: SimpleDateFormat,
+        private val onRemove: (ProductModel) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(product: ProductModel) {
@@ -51,28 +46,36 @@ class BlacklistAdapter(
                 dateFormat.format(Date(product.addedAt))
             )
 
-            val riskChip = binding.chipBlacklistRisk
             when (product.riskLevel) {
                 ScanRisk.DANGER -> {
-                    riskChip.setText(R.string.blacklist_risk_danger)
-                    riskChip.setChipBackgroundColorResource(R.color.risk_danger_container)
-                    riskChip.setTextColor(ContextCompat.getColor(ctx, R.color.risk_danger_on))
+                    binding.chipBlacklistRisk.setText(R.string.blacklist_risk_danger)
+                    binding.chipBlacklistRisk.setChipBackgroundColorResource(R.color.risk_danger_container)
+                    binding.chipBlacklistRisk.setTextColor(ContextCompat.getColor(ctx, R.color.risk_danger_on))
                 }
                 ScanRisk.WARNING -> {
-                    riskChip.setText(R.string.blacklist_risk_warning)
-                    riskChip.setChipBackgroundColorResource(R.color.risk_warning_container)
-                    riskChip.setTextColor(ContextCompat.getColor(ctx, R.color.risk_warning_on))
+                    binding.chipBlacklistRisk.setText(R.string.blacklist_risk_warning)
+                    binding.chipBlacklistRisk.setChipBackgroundColorResource(R.color.risk_warning_container)
+                    binding.chipBlacklistRisk.setTextColor(ContextCompat.getColor(ctx, R.color.risk_warning_on))
                 }
                 else -> {
-                    riskChip.setText(R.string.risk_safe)
-                    riskChip.setChipBackgroundColorResource(R.color.risk_safe_container)
-                    riskChip.setTextColor(ContextCompat.getColor(ctx, R.color.risk_safe_on))
+                    binding.chipBlacklistRisk.setText(R.string.risk_safe)
+                    binding.chipBlacklistRisk.setChipBackgroundColorResource(R.color.risk_safe_container)
+                    binding.chipBlacklistRisk.setTextColor(ContextCompat.getColor(ctx, R.color.risk_safe_on))
                 }
             }
 
-            binding.btnRemoveFromBlacklist.setOnClickListener {
-                onRemove(product)
-            }
+            binding.btnRemoveFromBlacklist.setOnClickListener { onRemove(product) }
         }
+    }
+
+    private object DiffCallback : DiffUtil.ItemCallback<ProductModel>() {
+        override fun areItemsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean =
+            oldItem.id == newItem.id
+
+        override fun areContentsTheSame(oldItem: ProductModel, newItem: ProductModel): Boolean =
+            oldItem.productName == newItem.productName &&
+                oldItem.detectedText == newItem.detectedText &&
+                oldItem.riskLevel == newItem.riskLevel &&
+                oldItem.addedAt == newItem.addedAt
     }
 }

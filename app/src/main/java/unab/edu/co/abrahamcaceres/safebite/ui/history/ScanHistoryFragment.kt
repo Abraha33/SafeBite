@@ -7,6 +7,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.MenuProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -112,6 +113,11 @@ class ScanHistoryFragment : Fragment() {
     }
 
     private fun onFirestoreItemClick(scan: ScanHistoryModel) {
+        Toast.makeText(
+            requireContext(),
+            "${scan.productName} - ${scan.status}",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun onDestroyView() {

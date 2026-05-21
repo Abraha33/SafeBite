@@ -26,6 +26,9 @@ class ProfileFragment : Fragment() {
         ProfileViewModelFactory(requireActivity().application)
     }
 
+    private var editDialog: BottomSheetDialog? = null
+    private var editSheetBinding: BottomSheetProfileEditBinding? = null
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -61,6 +64,30 @@ class ProfileFragment : Fragment() {
             if (shouldNavigate) {
                 viewModel.consumeReturnToLogin()
                 findNavController().navigate(R.id.action_global_login)
+            }
+        }
+
+        viewModel.isSaving.observe(viewLifecycleOwner) { saving ->
+            editSheetBinding?.btnSaveProfile?.isEnabled = !saving
+            editSheetBinding?.btnSaveProfile?.text = if (saving) {
+                getString(R.string.profile_saving)
+            } else {
+                getString(R.string.profile_save_button)
+            }
+        }
+
+        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
+            when (success) {
+                true -> {
+                    editDialog?.dismiss()
+                    Toast.makeText(requireContext(), R.string.profile_save_success, Toast.LENGTH_SHORT).show()
+                    viewModel.consumeSaveSuccess()
+                }
+                false -> {
+                    Toast.makeText(requireContext(), R.string.profile_save_error, Toast.LENGTH_SHORT).show()
+                    viewModel.consumeSaveSuccess()
+                }
+                null -> {}
             }
         }
     }
@@ -100,13 +127,16 @@ class ProfileFragment : Fragment() {
 
     private fun showEditBottomSheet() {
         val currentState = viewModel.profileState.value ?: return
-        val dialog = BottomSheetDialog(requireContext())
+
+        editDialog = BottomSheetDialog(requireContext())
         val sheetBinding = BottomSheetProfileEditBinding.inflate(layoutInflater)
-        dialog.setContentView(sheetBinding.root)
+        editSheetBinding = sheetBinding
+        editDialog?.setContentView(sheetBinding.root)
 
         sheetBinding.inputEditName.setText(currentState.name)
 
         val predefinedAllergens = listOf("Sin Gluten", "Sin Lactosa", "Vegano", "Sin Mani", "Sin Azucar")
+        sheetBinding.chipGroupEditAllergens.removeAllViews()
         predefinedAllergens.forEach { allergen ->
             val chip = Chip(requireContext()).apply {
                 text = allergen
@@ -127,32 +157,17 @@ class ProfileFragment : Fragment() {
             viewModel.saveProfileChanges(newName, selectedAllergens)
         }
 
-        viewModel.isSaving.observe(viewLifecycleOwner) { saving ->
-            sheetBinding.btnSaveProfile.isEnabled = !saving
-            sheetBinding.btnSaveProfile.text = if (saving) {
-                getString(R.string.profile_save_button)
-            } else {
-                getString(R.string.profile_save_button)
-            }
+        sheetBinding.btnCancelEdit.setOnClickListener { editDialog?.dismiss() }
+
+        sheetBinding.btnSaveProfile.isEnabled = !(viewModel.isSaving.value ?: false)
+        sheetBinding.btnSaveProfile.text = getString(R.string.profile_save_button)
+
+        editDialog?.setOnDismissListener {
+            editSheetBinding = null
+            editDialog = null
         }
 
-        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
-            when (success) {
-                true -> {
-                    Toast.makeText(requireContext(), R.string.profile_save_success, Toast.LENGTH_SHORT).show()
-                    viewModel.consumeSaveSuccess()
-                    dialog.dismiss()
-                }
-                false -> {
-                    Toast.makeText(requireContext(), R.string.profile_save_error, Toast.LENGTH_SHORT).show()
-                    viewModel.consumeSaveSuccess()
-                }
-                null -> {}
-            }
-        }
-
-        sheetBinding.btnCancelEdit.setOnClickListener { dialog.dismiss() }
-        dialog.show()
+        editDialog?.show()
     }
 
     override fun onDestroyView() {
