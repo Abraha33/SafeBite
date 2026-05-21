@@ -4,12 +4,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.chip.Chip
 import unab.edu.co.abrahamcaceres.safebite.R
+import unab.edu.co.abrahamcaceres.safebite.databinding.BottomSheetProfileEditBinding
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentProfileBinding
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ProfileViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ProfileViewModelFactory
@@ -43,7 +46,7 @@ class ProfileFragment : Fragment() {
         }
 
         setupObservers()
-        setupLogout()
+        setupButtons()
         viewModel.loadCurrentUser()
     }
 
@@ -81,10 +84,75 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun setupLogout() {
+    private fun setupButtons() {
         binding.btnLogout.setOnClickListener {
             viewModel.logout()
         }
+
+        binding.btnEditProfile.setOnClickListener {
+            showEditBottomSheet()
+        }
+
+        binding.btnBlacklist.setOnClickListener {
+            findNavController().navigate(R.id.action_profile_to_blacklist)
+        }
+    }
+
+    private fun showEditBottomSheet() {
+        val currentState = viewModel.profileState.value ?: return
+        val dialog = BottomSheetDialog(requireContext())
+        val sheetBinding = BottomSheetProfileEditBinding.inflate(layoutInflater)
+        dialog.setContentView(sheetBinding.root)
+
+        sheetBinding.inputEditName.setText(currentState.name)
+
+        val predefinedAllergens = listOf("Sin Gluten", "Sin Lactosa", "Vegano", "Sin Mani", "Sin Azucar")
+        predefinedAllergens.forEach { allergen ->
+            val chip = Chip(requireContext()).apply {
+                text = allergen
+                isCheckable = true
+                isChecked = currentState.allergens.contains(allergen)
+            }
+            sheetBinding.chipGroupEditAllergens.addView(chip)
+        }
+
+        sheetBinding.btnSaveProfile.setOnClickListener {
+            val newName = sheetBinding.inputEditName.text?.toString().orEmpty()
+            val checkedIds = sheetBinding.chipGroupEditAllergens.checkedChipIds
+            val selectedAllergens = mutableListOf<String>()
+            for (id in checkedIds) {
+                val chip = sheetBinding.chipGroupEditAllergens.findViewById<Chip>(id)
+                chip?.let { selectedAllergens.add(it.text.toString()) }
+            }
+            viewModel.saveProfileChanges(newName, selectedAllergens)
+        }
+
+        viewModel.isSaving.observe(viewLifecycleOwner) { saving ->
+            sheetBinding.btnSaveProfile.isEnabled = !saving
+            sheetBinding.btnSaveProfile.text = if (saving) {
+                getString(R.string.profile_save_button)
+            } else {
+                getString(R.string.profile_save_button)
+            }
+        }
+
+        viewModel.saveSuccess.observe(viewLifecycleOwner) { success ->
+            when (success) {
+                true -> {
+                    Toast.makeText(requireContext(), R.string.profile_save_success, Toast.LENGTH_SHORT).show()
+                    viewModel.consumeSaveSuccess()
+                    dialog.dismiss()
+                }
+                false -> {
+                    Toast.makeText(requireContext(), R.string.profile_save_error, Toast.LENGTH_SHORT).show()
+                    viewModel.consumeSaveSuccess()
+                }
+                null -> {}
+            }
+        }
+
+        sheetBinding.btnCancelEdit.setOnClickListener { dialog.dismiss() }
+        dialog.show()
     }
 
     override fun onDestroyView() {

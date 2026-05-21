@@ -116,5 +116,14 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/scannerFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_profile_to_blacklist"
+            app:destination="@id/blacklistFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/blacklistFragment"
+        android:name="unab.edu.co.abrahamcaceres.safebite.ui.blacklist.BlacklistFragment"
+        android:label="@string/blacklist_title"
+        tools:layout="@layout/fragment_blacklist" />
 </navigation>

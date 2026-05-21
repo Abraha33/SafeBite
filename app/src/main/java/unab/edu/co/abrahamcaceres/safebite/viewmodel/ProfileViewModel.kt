@@ -8,14 +8,17 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import unab.edu.co.abrahamcaceres.safebite.data.repository.FirebaseFirestoreRepository
+import unab.edu.co.abrahamcaceres.safebite.data.repository.FirestoreDataRepository
 import unab.edu.co.abrahamcaceres.safebite.data.repository.UserRepository
+import unab.edu.co.abrahamcaceres.safebite.model.cloud.UserCloudModel
 import unab.edu.co.abrahamcaceres.safebite.ui.profile.ProfileUiState
 import unab.edu.co.abrahamcaceres.safebite.utils.SessionManager
 
 class ProfileViewModel(
     application: Application,
     private val userRepository: UserRepository,
-    private val firestoreRepo: FirebaseFirestoreRepository
+    private val firebaseFirestoreRepo: FirebaseFirestoreRepository,
+    private val firestoreDataRepo: FirestoreDataRepository
 ) : AndroidViewModel(application) {
 
     private val sessionManager = SessionManager(application.applicationContext)
@@ -25,6 +28,16 @@ class ProfileViewModel(
 
     private val _shouldReturnToLogin = MutableLiveData(false)
     val shouldReturnToLogin: LiveData<Boolean> = _shouldReturnToLogin
+
+    private val _isSaving = MutableLiveData(false)
+    val isSaving: LiveData<Boolean> = _isSaving
+
+    private val _saveSuccess = MutableLiveData<Boolean?>(null)
+    val saveSuccess: LiveData<Boolean?> = _saveSuccess
+
+    fun consumeSaveSuccess() {
+        _saveSuccess.value = null
+    }
 
     fun loadCurrentUser() {
         viewModelScope.launch {
@@ -48,7 +61,7 @@ class ProfileViewModel(
                 return@launch
             }
 
-            firestoreRepo.fetchUserProfile(firebaseUser.uid).fold(
+            firebaseFirestoreRepo.fetchUserProfile(firebaseUser.uid).fold(
                 onSuccess = { cloudUser ->
                     _profileState.postValue(
                         ProfileUiState(
@@ -68,6 +81,38 @@ class ProfileViewModel(
                         )
                     )
                     _shouldReturnToLogin.postValue(false)
+                }
+            )
+        }
+    }
+
+    fun saveProfileChanges(newName: String, newAllergens: List<String>) {
+        val auth = FirebaseAuth.getInstance().currentUser ?: return
+        _isSaving.value = true
+
+        viewModelScope.launch {
+            val update = UserCloudModel(
+                uid = auth.uid,
+                name = newName.trim(),
+                email = auth.email ?: "",
+                city = "",
+                allergens = newAllergens
+            )
+            firestoreDataRepo.updateUserProfile(update).fold(
+                onSuccess = {
+                    _profileState.postValue(
+                        ProfileUiState(
+                            name = newName.trim(),
+                            email = auth.email ?: "",
+                            allergens = newAllergens
+                        )
+                    )
+                    _isSaving.postValue(false)
+                    _saveSuccess.postValue(true)
+                },
+                onFailure = {
+                    _isSaving.postValue(false)
+                    _saveSuccess.postValue(false)
                 }
             )
         }

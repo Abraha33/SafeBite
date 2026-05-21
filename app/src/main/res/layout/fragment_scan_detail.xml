@@ -132,6 +132,21 @@
                         android:lineSpacingMultiplier="1.2"
                         android:textAppearance="?attr/textAppearanceBodyMedium"
                         tools:text="Ingredientes: leche en polvo, maní, trigo (gluten), soya." />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/chipCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="12dp"
+                        app:chipBackgroundColor="?attr/colorPrimaryContainer"
+                        app:chipStrokeWidth="0dp"
+                        tools:text="4 Ingredientes procesados" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutIngredientGrid"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

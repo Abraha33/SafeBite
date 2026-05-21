@@ -18,14 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import unab.edu.co.abrahamcaceres.safebite.R
 import unab.edu.co.abrahamcaceres.safebite.databinding.FragmentScanHistoryBinding
-import unab.edu.co.abrahamcaceres.safebite.model.ProductScan
+import unab.edu.co.abrahamcaceres.safebite.model.cloud.ScanHistoryModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModel
 import unab.edu.co.abrahamcaceres.safebite.viewmodel.ScanHistoryViewModelFactory
 
-/**
- * Historial de productos analizados: RecyclerView + Room + MVVM.
- * Desde aquÃ­ se navega al detalle usando Safe Args.
- */
 class ScanHistoryFragment : Fragment() {
 
     private var _binding: FragmentScanHistoryBinding? = null
@@ -35,8 +31,8 @@ class ScanHistoryFragment : Fragment() {
         ScanHistoryViewModelFactory(requireActivity().application)
     }
 
-    private val adapter = ScanHistoryAdapter { scan ->
-        onScanItemClick(scan)
+    private val firestoreAdapter = ScanHistoryFirestoreAdapter { scan ->
+        onFirestoreItemClick(scan)
     }
 
     override fun onCreateView(
@@ -61,18 +57,23 @@ class ScanHistoryFragment : Fragment() {
         }
 
         binding.rvScanHistory.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvScanHistory.adapter = adapter
+        binding.rvScanHistory.adapter = firestoreAdapter
 
         binding.buttonAddSampleScan.setOnClickListener {
             viewModel.insertSampleScan()
         }
 
-        viewModel.scans.observe(viewLifecycleOwner) { list ->
-            adapter.submitList(list)
+        viewModel.scansFromFirestore.observe(viewLifecycleOwner) { list ->
+            firestoreAdapter.submitList(list)
             val empty = list.isNullOrEmpty()
             binding.layoutEmptyHistory.visibility = if (empty) View.VISIBLE else View.GONE
             binding.rvScanHistory.visibility = if (empty) View.GONE else View.VISIBLE
+            binding.textCloudStatus.visibility = if (empty) View.GONE else View.VISIBLE
+            binding.textCloudStatus.text = getString(R.string.history_cloud_status, list.size)
+            binding.buttonAddSampleScan.visibility = if (empty) View.VISIBLE else View.GONE
         }
+
+        viewModel.observeFirestoreScanHistory()
     }
 
     private inner class HistoryMenuProvider : MenuProvider {
@@ -110,9 +111,7 @@ class ScanHistoryFragment : Fragment() {
             .show()
     }
 
-    private fun onScanItemClick(scan: ProductScan) {
-        val action = ScanHistoryFragmentDirections.actionHistoryToDetail(scan.getId())
-        findNavController().navigate(action)
+    private fun onFirestoreItemClick(scan: ScanHistoryModel) {
     }
 
     override fun onDestroyView() {

@@ -100,6 +100,8 @@
     <string name="history_detail_risk_label">Estado de riesgo</string>
     <string name="history_detail_ingredients_label">Ingredientes detectados por ML Kit</string>
     <string name="history_detail_empty_ingredients">No se detectaron ingredientes legibles en este escaneo.</string>
+    <string name="ingredients_processed">Ingredientes procesados</string>
+    <string name="history_cloud_status">%1$d escaneos sincronizados en la nube</string>
 
     <!-- Perfil -->
     <string name="profile_open_button">Ver perfil</string>
@@ -112,6 +114,23 @@
     <string name="profile_avatar_cd">Foto de perfil</string>
     <string name="profile_health_title">Mi Configuración de Salud</string>
     <string name="profile_health_empty">Sin alérgenos configurados</string>
+    <string name="profile_edit_button">Editar Perfil</string>
+    <string name="profile_edit_title">Editar Perfil</string>
+    <string name="profile_edit_allergens_label">Selecciona tus alérgenos</string>
+    <string name="profile_save_button">Guardar Cambios</string>
+    <string name="profile_cancel_button">Cancelar</string>
+    <string name="profile_save_success">Perfil actualizado correctamente</string>
+    <string name="profile_save_error">Error al guardar los cambios</string>
+
+    <!-- Lista Negra -->
+    <string name="blacklist_title">Lista Negra</string>
+    <string name="blacklist_empty">No hay productos en tu lista negra. Los productos marcados como peligroso aparecerán aquí.</string>
+    <string name="blacklist_item_cd">Producto en lista negra</string>
+    <string name="blacklist_remove_cd">Eliminar de lista negra</string>
+    <string name="blacklist_added_date">Agregado %1$s</string>
+    <string name="blacklist_risk_danger">Peligroso</string>
+    <string name="blacklist_risk_warning">Precaución</string>
+    <string name="action_blacklist">Ver lista negra</string>
 
     <!-- Historial - vacío -->
     <string name="history_empty_cd">Sin escaneos aún</string>
